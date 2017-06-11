@@ -1,5 +1,6 @@
 package com.sisbarra.orienteegame;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -9,7 +10,9 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //TODO: Qui creo intent per creare l'activity vera e propria
+        //Qui creo intent per creare l'activity vera e propria
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
 
         finish();
     }

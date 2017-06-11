@@ -2,13 +2,13 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:drawable="@color/colorPrimaryDark"/>
+        android:drawable="@color/colorAccent"/>
 
     <item>
         <bitmap
             android:antialias="true"
             android:gravity="center"
-            android:src="@drawable/white-wind-rose"/>
+            android:src="@drawable/white_wind_rose"/>
     </item>
 
 </layer-list>

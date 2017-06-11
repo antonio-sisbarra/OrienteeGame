@@ -7,16 +7,23 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/SplashTheme">
-        <activity android:name=".SplashActivity">
+        android:supportsRtl="true">
+
+        <!-- Activity che esegue lo splashscreen, usando il tema personalizzato-->
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+
+        <!-- Activity vera e propria da cui parte tutta l'app -->
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 
