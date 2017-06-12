@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">OrienteeGame</string>
+    <string name="title_activity_main">OrienteeGame</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="tab_one">Gioca</string>
+    <string name="tab_two">Percorsi</string>
+    <string name="tab_three">Storia</string>
 </resources>

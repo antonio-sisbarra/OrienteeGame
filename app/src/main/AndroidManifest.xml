@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true">
 
-        <!-- Activity che esegue lo splashscreen, usando il tema personalizzato-->
+        <!-- Activity che esegue lo splashscreen, usando il tema personalizzato -->
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme">
@@ -23,7 +23,8 @@
         <!-- Activity vera e propria da cui parte tutta l'app -->
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:label="@string/title_activity_main"
+            android:theme="@style/MyMaterialTheme">
         </activity>
     </application>
 
