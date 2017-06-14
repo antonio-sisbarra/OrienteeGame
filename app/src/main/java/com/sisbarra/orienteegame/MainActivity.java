@@ -1,8 +1,8 @@
 package com.sisbarra.orienteegame;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,8 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 //Codice dell'activity principale che contiene le tre sezioni della app
@@ -38,7 +36,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int mNTabs = 3;
 
-    /* Icone per modalità GAME, PERCORSI DA FARE, STORIA*/
+    //Nome delle preferences
+    public final String PREFERENCE_FILENAME = getString(R.string.filename_pref);
+
+    private SharedPreferences gameSettings;
+
+    /* Vettore di id di icona per le sezioni */
     private int[] mTabIcons = {
             android.R.drawable.ic_menu_compass,
             android.R.drawable.ic_menu_mapmode,
@@ -66,19 +69,25 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
 
-        //Setta le icone per le tab
+        //Setta le icone con testo per le tab (sono custom)
         setupTabIcons();
 
-        //TODO:DA COMPLETARE
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //TODO: Verifica dei permessi necessari (comprese API Google)
 
+        //TODO: Verifica della connessione a internet e gps
+
+        //TODO: Verifica dell'username e se siamo al primo utilizzo del gioco -> Dialog
+        verifyFirstTime();
+
+    }
+
+    //Verifica se l'utente è la prima volta che gioca, e in caso si provvede a prendere l'username
+    private void verifyFirstTime(){
+        gameSettings = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        Boolean first = gameSettings.getBoolean("firstTime", false);
+        if(first)
+            //TODO: Mostra un Dialog per prendere l'user
+            ;
     }
 
     //Setta le icone e il testo per le tab
@@ -102,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    //TODO: DA IMPLEMENTARE ANCORA
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -109,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    //TODO: DA IMPLEMENTARE ANCORA
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -124,41 +135,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
-
-    /**
      * Un {@link FragmentPagerAdapter} che restituisce il fragment corrispondente a
      * una sezione.
      */
@@ -171,9 +147,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         //Restituisce il fragment per una data posizione
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            //Faccio uno switch sulla position (0 game, 1 others, 2 history
+            switch (position){
+                case 0: return StartGameFragment.newInstance();
+                case 1: return OthersFragment.newInstance("pippo", "cacca");
+                case 2: return HistoryFragment.newInstance("Ue", "ue");
+                default: return StartGameFragment.newInstance();
+            }
         }
 
         @Override

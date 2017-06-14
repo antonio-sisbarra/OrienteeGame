@@ -1,12 +1,13 @@
 <resources>
     <string name="app_name">OrienteeGame</string>
     <string name="title_activity_main">OrienteeGame</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Impostazioni</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="tab_one">Gioca</string>
-    <string name="tab_two">Percorsi</string>
+    <string name="tab_two">Altri</string>
     <string name="tab_three">Storia</string>
     <string name="available_matches">Scegli quale sfida vuoi completare:</string>
+    <string name="filename_pref">GamePrefs</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
