@@ -9,46 +9,46 @@
               android:theme="@style/AppTheme">
 
     <!-- Layout che contiene un'icona e l'indicatore del punteggio-->
-    <LinearLayout
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_weight="1">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_dialog_info"
-            android:tint="@color/colorPrimaryDark"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:textSize="@dimen/font_size_text_hello_game"
-            android:id="@+id/totalpointstext"
-            android:textColor="@color/colorPrimary"
-            android:fontFamily="@string/font_fontFamily_medium"
-            android:text="Ciao Antonio, hai totalizzato 1000 punti fino ad ora"/>
-
-    </LinearLayout>
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:textSize="@dimen/font_size_text_hello_game"
+        android:id="@+id/totalpointstext"
+        android:textColor="@color/colorPrimary"
+        android:fontFamily="@string/font_fontFamily_medium"
+        android:text="Ciao Antonio, hai totalizzato 1000 punti"
+        android:drawableStart="@android:drawable/ic_dialog_info"
+        android:drawableLeft="@android:drawable/ic_dialog_info"
+        android:drawablePadding="@dimen/activity_horizontal_margin"
+        android:drawableTint="@color/colorPrimaryDark"
+        android:layout_gravity="bottom"
+        android:layout_weight="1"/>
 
     <!-- TextView che fa da titolo alle partite disponibili -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
         android:textSize="@dimen/font_size_text_hello_game"
         android:textColor="@color/colorPrimary"
         android:fontFamily="@string/font_fontFamily_medium"
         android:text="@string/available_matches"
+        android:drawableStart="@android:drawable/ic_dialog_map"
+        android:drawableLeft="@android:drawable/ic_dialog_map"
+        android:drawablePadding="@dimen/activity_horizontal_margin"
+        android:drawableTint="@color/colorPrimaryDark"
+        android:layout_gravity="bottom"
         android:layout_weight="1"/>
 
     <!-- TODO:ListView con le tipologie di partite disponibili -->
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="3">
+        android:layout_weight="50">
 
 
     </ListView>
