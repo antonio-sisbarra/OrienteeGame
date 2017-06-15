@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 /**
  * Created by Antonio Sisbarra on 15/06/2017.
@@ -46,8 +47,12 @@ public class CreateUserDialogFragment extends AppCompatDialogFragment {
         alertDialogBuilder.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                return keyCode == KeyEvent.KEYCODE_BACK
-                        && event.getAction() == KeyEvent.ACTION_UP;
+                if(keyCode == KeyEvent.KEYCODE_BACK
+                        && event.getAction() == KeyEvent.ACTION_UP){
+                    Toast.makeText(getContext(), R.string.no_exit_user, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
             }
         });
         alertDialogBuilder.setCancelable(false);

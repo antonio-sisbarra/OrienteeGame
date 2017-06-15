@@ -11,6 +11,7 @@
     <string name="lbl_user_text">Inserisci il tuo username:</string>
     <string name="create_user_title_dialog">Username</string>
     <string name="confirm_text_dialog">Conferma</string>
+    <string name="no_exit_user">Devi inserire uno username!</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
