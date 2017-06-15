@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int mNTabs = 3;
 
     //Nome delle preferences
-    public final String PREFERENCE_FILENAME = getString(R.string.filename_pref);
+    public String PREFERENCE_FILENAME = null;
 
     private SharedPreferences gameSettings;
 
@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        PREFERENCE_FILENAME = getString(R.string.filename_pref);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
