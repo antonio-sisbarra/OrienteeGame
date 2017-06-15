@@ -5,20 +5,18 @@
               android:orientation="vertical"
               android:gravity="center"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/lbl_user"
-        android:text="@string/lbl_user_text"
-        android:textColor="@color/colorPrimary"/>
+              android:layout_height="match_parent"
+              android:padding="@dimen/cardview_padding">
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/edit_user"
         android:inputType="text"
-        android:imeOptions="actionDone"/>
+        android:imeOptions="actionDone"
+        android:cursorVisible="true"
+        android:textCursorDrawable="@null"
+        android:hint="@string/lbl_user_text"
+        android:textColor="@color/colorPrimary"/>
 
 </LinearLayout>

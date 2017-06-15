@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
         PREFERENCE_FILENAME = getString(R.string.filename_pref);
 
+        /*TODO: FORSE LA COSA MIGLIORE E' USARE UN ACTIVITY DIVERSA PER SETTARE LO USERNAME*/
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
@@ -86,10 +88,11 @@ public class MainActivity extends AppCompatActivity {
     //Verifica se l'utente è la prima volta che gioca, e in caso si provvede a prendere l'username
     private void verifyFirstTime(){
         gameSettings = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
-        Boolean first = gameSettings.getBoolean("firstTime", false);
+        Boolean first = gameSettings.getBoolean("firstTime", true);
         if(first)
             //Mostra un Dialog per prendere l'user
             showCreateUserDialog();
+            //TODO: Setta a false la preference
     }
 
     //Mostra un dialog per prendere l'user

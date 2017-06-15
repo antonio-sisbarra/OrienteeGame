@@ -1,24 +1,16 @@
 package com.sisbarra.orienteegame;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.EditText;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by Antonio Sisbarra on 15/06/2017.
  */
 
 public class CreateUserDialogFragment extends AppCompatDialogFragment {
-
-    private EditText mEditUser;
 
     public CreateUserDialogFragment() {
         // Empty constructor is required for DialogFragment
@@ -35,27 +27,20 @@ public class CreateUserDialogFragment extends AppCompatDialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_create_user, container);
-    }
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        String title = getArguments().getString("title");
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.AppAlertTheme);
+        alertDialogBuilder.setTitle(title);
+        alertDialogBuilder.setIcon(R.drawable.ic_my_info);
+        alertDialogBuilder.setView(R.layout.fragment_create_user);
+        alertDialogBuilder.setPositiveButton(getString(R.string.confirm_text_dialog),  new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //TODO: on success
+            }
+        });
+        alertDialogBuilder.setCancelable(false);
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        // Get field from view
-        mEditUser = (EditText) view.findViewById(R.id.edit_user);
-        // Fetch arguments from bundle and set title
-        String title = getArguments().getString("title", getString(R.string.lbl_user_text));
-        getDialog().setTitle(title);
-        // Show soft keyboard automatically and request focus to field
-        mEditUser.requestFocus();
-        try {
-            getDialog().getWindow().setSoftInputMode(
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-        }
-        catch (NullPointerException e) {
-            Log.e(TAG, e.toString());
-        }
+        return alertDialogBuilder.create();
     }
 }
