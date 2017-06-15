@@ -3,11 +3,14 @@ package com.sisbarra.orienteegame;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
+import android.view.KeyEvent;
 
 /**
  * Created by Antonio Sisbarra on 15/06/2017.
+ * Incapsula il dialog fragment che prende in input lo user all'avvio.
  */
 
 public class CreateUserDialogFragment extends AppCompatDialogFragment {
@@ -26,6 +29,7 @@ public class CreateUserDialogFragment extends AppCompatDialogFragment {
         return frag;
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         String title = getArguments().getString("title");
@@ -37,6 +41,13 @@ public class CreateUserDialogFragment extends AppCompatDialogFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //TODO: on success
+            }
+        });
+        alertDialogBuilder.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                return keyCode == KeyEvent.KEYCODE_BACK
+                        && event.getAction() == KeyEvent.ACTION_UP;
             }
         });
         alertDialogBuilder.setCancelable(false);

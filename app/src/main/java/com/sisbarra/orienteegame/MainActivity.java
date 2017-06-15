@@ -18,6 +18,9 @@ import android.widget.TextView;
 //Codice dell'activity principale che contiene le tre sezioni della app
 public class MainActivity extends AppCompatActivity {
 
+    private static final int mNTabs = 3;
+    //Nome delle preferences
+    public String PREFERENCE_FILENAME = null;
     /**
      * Il {@link android.support.v4.view.PagerAdapter} che fornirà
      * i fragments per ognuna delle sezioni. Uso una sottoclasse di
@@ -25,20 +28,12 @@ public class MainActivity extends AppCompatActivity {
      * caricato in memoria.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
     /**
      * Il {@link ViewPager} che contiene i contenuti.
      */
     private ViewPager mViewPager;
-
     private Toolbar mToolbar;
     private TabLayout mTabLayout;
-
-    private static final int mNTabs = 3;
-
-    //Nome delle preferences
-    public String PREFERENCE_FILENAME = null;
-
     private SharedPreferences gameSettings;
 
     /* Vettore di id di icona per le sezioni */
@@ -56,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         PREFERENCE_FILENAME = getString(R.string.filename_pref);
-
-        /*TODO: FORSE LA COSA MIGLIORE E' USARE UN ACTIVITY DIVERSA PER SETTARE LO USERNAME*/
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
