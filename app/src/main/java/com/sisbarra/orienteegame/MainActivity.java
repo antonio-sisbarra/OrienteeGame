@@ -88,8 +88,15 @@ public class MainActivity extends AppCompatActivity {
         gameSettings = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
         Boolean first = gameSettings.getBoolean("firstTime", false);
         if(first)
-            //TODO: Mostra un Dialog per prendere l'user
-            ;
+            //Mostra un Dialog per prendere l'user
+            showCreateUserDialog();
+    }
+
+    //Mostra un dialog per prendere l'user
+    private void showCreateUserDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        CreateUserDialogFragment editNameDialogFragment = CreateUserDialogFragment.newInstance(getString(R.string.create_user_title_dialog));
+        editNameDialogFragment.show(fm, getString(R.string.create_user_title_dialog));
     }
 
     //Setta le icone e il testo per le tab

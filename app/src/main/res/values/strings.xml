@@ -8,6 +8,8 @@
     <string name="tab_three">Storia</string>
     <string name="available_matches">Scegli quale sfida vuoi completare:</string>
     <string name="filename_pref">GamePrefs</string>
+    <string name="lbl_user_text">Inserisci il tuo username:</string>
+    <string name="create_user_title_dialog">Username</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

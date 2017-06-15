@@ -14,7 +14,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/cardviewpoints"
         android:layout_gravity="center"
-        app:cardCornerRadius="@dimen/cornerradiusgame">
+        app:cardCornerRadius="@dimen/cornerradiusgame"
+        app:contentPaddingRight="@dimen/cardview_padding"
+        app:contentPaddingBottom="@dimen/cardview_padding"
+        app:contentPaddingTop="@dimen/activity_horizontal_margin">
 
         <!-- Layout che contiene un'icona e l'indicatore del punteggio-->
         <android.support.v7.widget.AppCompatTextView
@@ -42,6 +45,9 @@
         android:id="@+id/cardviewlist"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
+        app:contentPaddingRight="@dimen/cardview_padding"
+        app:contentPaddingBottom="@dimen/cardview_padding"
+        app:contentPaddingTop="@dimen/activity_horizontal_margin"
         app:cardCornerRadius="@dimen/cornerradiusgame">
 
         <!-- TextView che fa da titolo alle partite disponibili -->
