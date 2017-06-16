@@ -1,6 +1,7 @@
 package com.sisbarra.orienteegame;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -22,6 +23,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static String DB_PATH;
 
     private static String DB_NAME = "orienteegame_database.db";
+
+    private static String LAT_COLUMN = "lat";
+    private static String LONG_COLUMN = "long";
+
     private final Context myContext;
     private SQLiteDatabase myDataBase;
 
@@ -145,6 +150,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+    }
+
+    public Cursor getAllTargetCursor(){
+        return myDataBase.query(true, myContext.getString(R.string.name_table_targets),
+                new String[]{LAT_COLUMN, LONG_COLUMN}, null, null, null, null, null, null);
     }
 
     // TODO: Add your public helper methods to access and get content from the database.

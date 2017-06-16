@@ -60,8 +60,6 @@ public class StartGameFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        /** TODO: Bisogna creare un asynctask per prendere i dati degli obiettivi
-         **/
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_start_game, container, false);

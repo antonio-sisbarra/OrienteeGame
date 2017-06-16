@@ -1,74 +1,76 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:orientation="vertical"
               android:paddingBottom="@dimen/activity_vertical_margin"
               android:paddingLeft="@dimen/activity_horizontal_margin"
               android:paddingRight="@dimen/activity_horizontal_margin"
-              android:paddingTop="@dimen/activity_vertical_margin">
+              android:paddingTop="@dimen/activity_vertical_margin"
+    >
 
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cardviewpoints"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/cardviewpoints"
         android:layout_gravity="center"
         app:cardCornerRadius="@dimen/cornerradiusgame"
-        app:contentPaddingRight="@dimen/cardview_padding"
         app:contentPaddingBottom="@dimen/cardview_padding"
+        app:contentPaddingRight="@dimen/cardview_padding"
         app:contentPaddingTop="@dimen/activity_horizontal_margin">
 
         <!-- Layout che contiene un'icona e l'indicatore del punteggio-->
         <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/totalpointstext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:textSize="@dimen/font_size_text_hello_game"
-            android:id="@+id/totalpointstext"
-            android:textColor="@color/colorPrimary"
-            android:fontFamily="@string/font_fontFamily_medium"
-            android:text="Ciao Antonio, hai totalizzato 1000 punti"
-            android:drawableStart="@drawable/ic_my_info"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
             android:drawableLeft="@drawable/ic_my_info"
             android:drawablePadding="@dimen/activity_horizontal_margin"
-            android:layout_gravity="bottom"
-            android:layout_weight="1"/>
+            android:drawableStart="@drawable/ic_my_info"
+            android:fontFamily="@string/font_fontFamily_medium"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:text="@string/loading_textview"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/font_size_text_hello_game"/>
 
     </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cardviewlist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/cardviewlist"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
-        app:contentPaddingRight="@dimen/cardview_padding"
+        app:cardCornerRadius="@dimen/cornerradiusgame"
         app:contentPaddingBottom="@dimen/cardview_padding"
-        app:contentPaddingTop="@dimen/activity_horizontal_margin"
-        app:cardCornerRadius="@dimen/cornerradiusgame">
+        app:contentPaddingRight="@dimen/cardview_padding"
+        app:contentPaddingTop="@dimen/activity_horizontal_margin">
 
         <!-- TextView che fa da titolo alle partite disponibili -->
         <android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:textSize="@dimen/font_size_text_hello_game"
-            android:textColor="@color/colorPrimary"
-            android:fontFamily="@string/font_fontFamily_medium"
-            android:text="@string/available_matches"
-            android:drawableStart="@drawable/ic_mymaps"
+            android:layout_gravity="bottom"
             android:drawableLeft="@drawable/ic_mymaps"
             android:drawablePadding="@dimen/activity_horizontal_margin"
-            android:layout_gravity="bottom"/>
+            android:drawableStart="@drawable/ic_mymaps"
+            android:fontFamily="@string/font_fontFamily_medium"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:text="@string/loading_textview"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/font_size_text_hello_game"/>
 
         <!-- TODO:ListView con le tipologie di partite disponibili -->
         <ListView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
 
         </ListView>
