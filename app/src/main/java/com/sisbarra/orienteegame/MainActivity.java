@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int mNTabs = 3;
     //Nome delle preferences
-    public String PREFERENCE_FILENAME = null;
+    public static String PREFERENCE_FILENAME = null;
     /**
      * Il {@link android.support.v4.view.PagerAdapter} che fornirà
      * i fragments per ognuna delle sezioni. Uso una sottoclasse di
@@ -81,11 +81,10 @@ public class MainActivity extends AppCompatActivity {
     //Verifica se l'utente è la prima volta che gioca, e in caso si provvede a prendere l'username
     private void verifyFirstTime(){
         gameSettings = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
-        Boolean first = gameSettings.getBoolean("firstTime", true);
+        Boolean first = gameSettings.getBoolean(getString(R.string.first_time_pref), true);
         if(first)
             //Mostra un Dialog per prendere l'user
             showCreateUserDialog();
-            //TODO: Setta a false la preference
     }
 
     //Mostra un dialog per prendere l'user

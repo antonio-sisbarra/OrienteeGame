@@ -26,6 +26,35 @@ public class StartGameFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //TODO: ACCESSO AL DB
+        /*
+        *...
+
+                DataBaseHelper myDbHelper = new DataBaseHelper();
+                myDbHelper = new DataBaseHelper(this);
+
+                try {
+
+                    myDbHelper.createDataBase();
+
+            } catch (IOException ioe) {
+
+                throw new Error("Unable to create database");
+
+            }
+
+            try {
+
+                myDbHelper.openDataBase();
+
+            }catch(SQLException sqle){
+
+                throw sqle;
+
+            }
+
+                ...
+         */
     }
 
     @Override
