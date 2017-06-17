@@ -21,9 +21,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public static String LAT_COLUMN = "lat";
     public static String LONG_COLUMN = "long";
+    public static String ID_COLUMN = "_id";
+
     //The Android's default system path of my application database.
     private static String DB_PATH;
-    private static String DB_NAME = "orienteegame_database.db";
+    private static String DB_NAME = "orienteegame_database.sqlite";
     private final Context myContext;
     private SQLiteDatabase myDataBase;
 
@@ -35,7 +37,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public DataBaseHelper(Context context) {
         super(context, DB_NAME, null, 1);
 
-        DB_PATH = context.getFilesDir().getPath() + "YOUR_PACKAGE/databases/";
+        DB_PATH = "/data/data/com.sisbarra.orienteegame" + "/databases/";
         this.myContext = context;
     }
 
@@ -46,10 +48,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         boolean dbExist = checkDataBase();
 
-        if(dbExist){
-            //niente -> il db già esiste
-        }
-        else{
+        if(!dbExist){
             //Con questo metodo un db vuoto sarà creato nel path di default del sistema
             //dell'app perciò posso sovrascrivere quel db con il mio.
             this.getReadableDatabase();
@@ -62,7 +61,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 throw new Error(myContext.getString(R.string.error_copy_db));
             }
         }
-
     }
 
     /**
@@ -151,8 +149,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getAllTargetCursor(){
+
         return myDataBase.query(true, myContext.getString(R.string.name_table_targets),
-                new String[]{LAT_COLUMN, LONG_COLUMN}, null, null, null, null, null, null);
+                new String[]{ID_COLUMN, LAT_COLUMN, LONG_COLUMN}, null, null, null, null, null, null);
     }
 
     // TODO: Add your public helper methods to access and get content from the database.
