@@ -22,10 +22,15 @@
 
     <!-- Errori -->
     <string name="error_copy_db">Errore nel copiare il database</string>
+    <string name="error_create_db">Errore nel creare il database</string>
 
     <!-- Loading per le textview -->
     <string name="loading_textview">Caricamento in corso..</string>
 
+    <!-- Numero di righe nella listview delle sfide -->
+    <integer name="nrow_challenges">3</integer>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_path_on_maps">Map</string>
 </resources>

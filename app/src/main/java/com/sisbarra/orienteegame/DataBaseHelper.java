@@ -19,14 +19,11 @@ import java.io.OutputStream;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
+    public static String LAT_COLUMN = "lat";
+    public static String LONG_COLUMN = "long";
     //The Android's default system path of my application database.
     private static String DB_PATH;
-
     private static String DB_NAME = "orienteegame_database.db";
-
-    private static String LAT_COLUMN = "lat";
-    private static String LONG_COLUMN = "long";
-
     private final Context myContext;
     private SQLiteDatabase myDataBase;
 
@@ -58,6 +55,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             this.getReadableDatabase();
 
             try {
+                //TODO: QUI SUCCEDE UN PROBLEMA OCCHIO!!
                 copyDataBase();
             }
             catch (IOException e) {
