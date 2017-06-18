@@ -27,6 +27,7 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 
 
+
 /**
  * Sottoclasse di Fragment che contiene la parte iniziale di una partita
  * Contiene un listener per la location
@@ -40,11 +41,14 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
         //TODO: Da implementare
         @Override
         public void onLocationChanged(Location location) {
-            //Vedo se il db è già stato caricato
-            if(mAdapter!=null) {
-                mAdapter.setCurrentLocation(location);
-                mAdapter.notifyDataSetChanged();
-            }
+            mAdapter.setCurrentLocation(location);
+            mAdapter.notifyDataSetChanged();
+
+            //Controllo se è stato già attaccato un adapter
+            if(mLstTargets.getAdapter()==null)
+                mLstTargets.setAdapter(mAdapter);
+
+
         }
 
         @Override
@@ -62,6 +66,7 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
 
         }
     };
+    private String mProvider;
     private DataBaseHelper mHelper;
 
     public StartGameFragment() {
@@ -81,6 +86,10 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
 
         //Inizializza il loader -> chiama onCreateLoader
         getActivity().getSupportLoaderManager().initLoader(1, null, this);
+
+        //Inizializza il location manager
+        mLocationManager = (LocationManager)
+                getActivity().getSystemService(Context.LOCATION_SERVICE);
     }
 
     /**
@@ -92,18 +101,13 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
     @Override
     public void onResume() {
         super.onResume();
-
-        checkLocationPermission();
-        checkGPS();
     }
 
-    //Controlla i permessi per la posizione e setta il listener
-    private void checkLocationPermission(){
-        mLocationManager = (LocationManager)
-                getActivity().getSystemService(Context.LOCATION_SERVICE);
+    //Controlla i permessi per la posizione
+    private void checkLocationPermission() {
         Criteria crit = new Criteria();
-        crit.setAccuracy(Criteria.ACCURACY_FINE);
-        String prov = mLocationManager.getBestProvider(crit, true);
+        crit.setAccuracy(Criteria.ACCURACY_MEDIUM);
+        mProvider = mLocationManager.getBestProvider(crit, true);
         if (ActivityCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getContext(),
@@ -113,21 +117,18 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
-            return;
         }
-
-        mLocationManager.requestLocationUpdates(prov, 5000, 5, mLocationListener);
     }
 
     //Controlla se il GPS è acceso
-    private void checkGPS(){
-        if ( !mLocationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+    private void checkGPS() {
+        if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
         }
     }
 
     //Costruisce l'alert per il gps
-    private void buildAlertMessageNoGps(){
+    private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppAlertTheme);
         builder.setMessage(getString(R.string.gps_request))
                 .setCancelable(false)
@@ -173,6 +174,7 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
 
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
+                    return;
 
                 } else {
 
@@ -181,7 +183,6 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
                     //TODO: GESTIONE PIU' FINE
                     getActivity().finish();
                 }
-                return;
             }
 
             // other 'case' lines to check for other
@@ -235,11 +236,10 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
      */
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getContext(), null, null, null, null, null){
+        return new CursorLoader(getContext(), null, null, null, null, null) {
             @Override
             //In Background carico il db dei target e il cursor relativo
-            public Cursor loadInBackground()
-            {
+            public Cursor loadInBackground() {
                 //TODO: RECUPERA USER E PUNTEGGIO E AGGIORNA LA PRIMA CARD
 
                 try {
@@ -250,7 +250,7 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
                 }
                 try {
                     mHelper.openDataBase();
-                }catch(SQLException sqle){
+                } catch (SQLException sqle) {
                     throw sqle;
                 }
 
@@ -278,7 +278,7 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
      * them to you through new calls here.  You should not monitor the
      * data yourself.  For example, if the data is a {@link Cursor}
      * and you place it in a {@link CursorAdapter}, use
-     * the {@link CursorAdapter(Context, * Cursor, int)} constructor <em>without</em> passing
+     * the {@link CursorAdapter(Context,  Cursor, int)} constructor <em>without</em> passing
      * in either {@link CursorAdapter#FLAG_AUTO_REQUERY}
      * or {@link CursorAdapter#FLAG_REGISTER_CONTENT_OBSERVER}
      * (that is, use 0 for the flags argument).  This prevents the CursorAdapter
@@ -303,7 +303,20 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
         Cursor cursor = (Cursor) data;
         cursor.moveToFirst();
         mAdapter = new TargetsListCursorAdapter(getContext(), cursor, 0);
-        mLstTargets.setAdapter(mAdapter);
+
+        //A questo punto inizio a chiedere la posizione
+        checkGPS();
+        checkLocationPermission();
+        mLocationManager.requestLocationUpdates(mProvider, 5000, 0, mLocationListener);
+
+        //Setto l'ultima posizione disponibile se esiste
+        Location locat = mLocationManager.getLastKnownLocation(mProvider);
+        if(locat != null) {
+            mAdapter.setCurrentLocation(locat);
+            mAdapter.notifyDataSetChanged();
+            mLstTargets.setAdapter(mAdapter);
+        }
+
         //TODO: CAMBIARE TEXT DELLA SECONDA CARD (PRESENTAZIONE OBIETTIVI)
     }
 

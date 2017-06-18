@@ -17,7 +17,7 @@ import static com.sisbarra.orienteegame.R.string.medium_target_text;
 
 /**
  * Created by Antonio Sisbarra on 17/06/2017.
- * Adapter che prende i target dal db e ne spara 3 sulla listview
+ * Adapter che prende i target dal db e li spara sulla listview
  */
 
 public class TargetsListCursorAdapter extends CursorAdapter {
@@ -44,7 +44,7 @@ public class TargetsListCursorAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return mInflater.inflate(R.layout.challenge_view, parent, false);
+        return LayoutInflater.from(context).inflate(R.layout.challenge_view, parent, false);
     }
 
     /**
@@ -135,7 +135,10 @@ public class TargetsListCursorAdapter extends CursorAdapter {
     }
 
     public void setCurrentLocation(Location loc){
-        mCurrentPos = loc;
+        //Verifico se ho già una location, se sì uso set e non new
+        if(mCurrentPos == null)
+            mCurrentPos = new Location(loc);
+        else
+            mCurrentPos.set(loc);
     }
-
 }
