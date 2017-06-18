@@ -12,6 +12,10 @@
     <string name="create_user_title_dialog">Username</string>
     <string name="confirm_text_dialog">Conferma</string>
     <string name="no_exit_user">Devi inserire uno username valido!</string>
+    <string name="gps_request">Il GPS sembra spento, lo vuoi attivare per giocare?</string>
+    <string name="easy_target_text">Obiettivo facile</string>
+    <string name="medium_target_text">Obiettivo medio</string>
+    <string name="hard_target_text">Obiettivo difficile</string>
 
     <!-- Nomi delle preferences -->
     <string name="first_time_pref">firstTime</string>

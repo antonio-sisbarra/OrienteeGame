@@ -3,12 +3,17 @@ package com.sisbarra.orienteegame;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.google.android.gms.maps.model.LatLng;
+import static com.sisbarra.orienteegame.R.string.easy_target_text;
+import static com.sisbarra.orienteegame.R.string.hard_target_text;
+import static com.sisbarra.orienteegame.R.string.medium_target_text;
 
 /**
  * Created by Antonio Sisbarra on 17/06/2017.
@@ -51,59 +56,82 @@ public class TargetsListCursorAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        //TODO: Calcola distanza dall'obiettivo in m
+        //Controllo se esiste una posizione attuale
+        if(mCurrentPos==null)
+            return;
+
+        //Calcola distanza dall'obiettivo in m
         int distance = calculateDistance(cursor);
 
-        //TODO: Calcola difficoltà
-        //TODO: Setta la view
+        //Calcola difficoltà
+        int diff = calculateDiff(distance);
 
-        /**
-        if(cursor.getPosition()%2==1) {
-            view.setBackgroundColor(context.getResources().getColor(R.color.background_odd));
-        }
-        else {
-            view.setBackgroundColor(context.getResources().getColor(R.color.background_even));
-        }
-
-        TextView content = (TextView) view.findViewById(R.id.row_content);
-        content.setText(cursor.getString(cursor.getColumnIndex(Table.CONTENT)));
-
-         // Find fields to populate in inflated template
-         TextView tvBody = (TextView) view.findViewById(R.id.tvBody);
-         TextView tvPriority = (TextView) view.findViewById(R.id.tvPriority);
-         // Extract properties from cursor
-         String body = cursor.getString(cursor.getColumnIndexOrThrow("body"));
-         int priority = cursor.getInt(cursor.getColumnIndexOrThrow("priority"));
-         // Populate fields with extracted properties
-         tvBody.setText(body);
-         tvPriority.setText(String.valueOf(priority));
-
-         */
+        //Setta la view
+        setTheView(view, context, distance, diff);
 
     }
 
-    //Calcola la distanza in linea d'aria dal target
+    //Setta la vista in base alla distanza e alla difficoltà
+    private void setTheView(View view, Context context, int dist, int diff){
+        ImageView img = (ImageView) view.findViewById(R.id.challengeicon);
+        TextView diftxt = (TextView) view.findViewById(R.id.difficultytext);
+        TextView distxt = (TextView) view.findViewById(R.id.distancetext);
+
+        switch (diff){
+            case 0:{
+                //Obiettivo facile
+                img.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_easy_challenge));
+                diftxt.setText(context.getText(easy_target_text));
+                distxt.setText(new StringBuilder().append("Sei distante ").append(dist).append(" m dall'obiettivo").toString());
+            }
+            case 1:{
+                //Obiettivo medio
+                img.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_medium_challenge));
+                diftxt.setText(context.getText(medium_target_text));
+                distxt.setText(new StringBuilder().append("Sei distante ").append(dist).append(" m dall'obiettivo").toString());
+            }
+            case 2:{
+                //Obiettivo hard
+                img.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_hard_challenge));
+                diftxt.setText(context.getText(hard_target_text));
+                distxt.setText(new StringBuilder().append("Sei distante ").append(dist).append(" m dall'obiettivo").toString());
+            }
+        }
+    }
+
+    //Calcola difficoltà in base alla distanza (500m 0, 1500m 1, else 2)
+    private int calculateDiff(int dist){
+        if (dist < 500) return 0;
+        else if(dist < 1500) return 1;
+             else return 2;
+    }
+
+    //Calcola la distanza in linea d'aria dal target (Senza usare API di Google)
     private int calculateDistance(Cursor cursor){
-        int dist = 0;
-        LatLng target = new LatLng(cursor.getDouble(cursor.getColumnIndex(DataBaseHelper.LAT_COLUMN)),
-                cursor.getDouble(cursor.getColumnIndex(DataBaseHelper.LONG_COLUMN)));
-        //TODO: Bisogna aspettare che la Location venga settata prima di calcolare la distanza?
+        int dist;
+        double latTarg = cursor.getDouble(cursor.getColumnIndex(DataBaseHelper.LAT_COLUMN));
+        double longTarg = cursor.getDouble(cursor.getColumnIndex(DataBaseHelper.LONG_COLUMN));
+
+        dist = distance(latTarg, longTarg, mCurrentPos.getLatitude(), mCurrentPos.getLongitude());
 
         return dist;
     }
 
-    /**
-     *
-     * Called when the ContentObserver on the cursor receives a change notification.
-     * The default implementation provides the auto-requery logic, but may be overridden by
-     * sub classes.
-     *
-     * @see (android.database.ContentObserver) onChange(boolean)
-     */
-    @Override
-    protected void onContentChanged() {
-        //TODO: COSA SUCCEDE QUI?
-        super.onContentChanged();
+    //Formula di Haversine per la distanza tra due punti
+    private int distance (double lat_a, double lng_a, double lat_b, double lng_b ){
+        double earthRadius = 3958.75;
+        double latDiff = Math.toRadians(lat_b-lat_a);
+        double lngDiff = Math.toRadians(lng_b-lng_a);
+        double a = Math.sin(latDiff /2) * Math.sin(latDiff /2) +
+                Math.cos(Math.toRadians(lat_a)) * Math.cos(Math.toRadians(lat_b)) *
+                        Math.sin(lngDiff /2) * Math.sin(lngDiff /2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double distance = earthRadius * c;
+
+        int meterConversion = 1609;
+
+        Double res = distance * meterConversion;
+        return res.intValue();
     }
 
     public void setCurrentLocation(Location loc){
