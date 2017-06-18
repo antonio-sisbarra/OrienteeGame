@@ -45,6 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/custom_tab_layout_height"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
         app:cardCornerRadius="@dimen/cornerradiusgame"
         app:contentPaddingBottom="@dimen/cardview_padding"
