@@ -17,8 +17,6 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 
-import java.io.IOException;
-
 
 /**
  * Sottoclasse di Fragment che contiene la parte iniziale di una partita
@@ -171,10 +169,10 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks{
             //In Background carico il db dei target e il cursor relativo
             public Cursor loadInBackground()
             {
-                mHelper = new DataBaseHelper(getContext());
                 try {
+                    mHelper = new DataBaseHelper(getContext());
                     mHelper.createDataBase();
-                } catch (IOException ioe) {
+                } catch (Exception e) {
                     throw new Error(getString(R.string.error_create_db));
                 }
                 try {

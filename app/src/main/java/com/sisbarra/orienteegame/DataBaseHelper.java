@@ -1,6 +1,7 @@
 package com.sisbarra.orienteegame;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,10 +35,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * Si tiene un riferimento al Context per accedere alle risorse
      * @param context
      */
-    public DataBaseHelper(Context context) {
+    public DataBaseHelper(Context context) throws PackageManager.NameNotFoundException {
         super(context, DB_NAME, null, 1);
 
-        DB_PATH = "/data/data/com.sisbarra.orienteegame" + "/databases/";
+        DB_PATH = context.getPackageManager().getPackageInfo(
+                context.getPackageName(), 0).applicationInfo.dataDir + "/databases/";
         this.myContext = context;
     }
 
