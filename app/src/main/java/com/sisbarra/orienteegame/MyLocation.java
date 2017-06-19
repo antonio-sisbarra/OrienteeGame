@@ -23,54 +23,38 @@ public class MyLocation {
     LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
+    LocationListener locationListenerNetwork = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            timer1.cancel();
+            locationResult.gotLocation(location);
+            mLocationManager.removeUpdates(this);
+            mLocationManager.removeUpdates(locationListenerGps);
+        }
+        public void onProviderDisabled(String provider) {}
+        public void onProviderEnabled(String provider) {}
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+    };
+    //I listener
+    LocationListener locationListenerGps = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            timer1.cancel();
+            locationResult.gotLocation(location);
+            mLocationManager.removeUpdates(this);
+            mLocationManager.removeUpdates(locationListenerNetwork);
+        }
+        public void onProviderDisabled(String provider) {}
+        public void onProviderEnabled(String provider) {}
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+    };
     private boolean gps_enabled;
     private boolean network_enabled;
     private Activity mActivity;
-    //I listener
-    private LocationListener locationListenerGps;
-    private LocationListener locationListenerNetwork;
 
     public MyLocation(LocationManager lm, boolean gps_enab, boolean netw_enab, Activity activ) {
         mLocationManager = lm;
         gps_enabled = gps_enab;
         network_enabled = netw_enab;
         mActivity = activ;
-
-        locationListenerGps = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                timer1.cancel();
-                locationResult.gotLocation(location);
-                mLocationManager.removeUpdates(this);
-                mLocationManager.removeUpdates(locationListenerNetwork);
-            }
-
-            public void onProviderDisabled(String provider) {
-            }
-
-            public void onProviderEnabled(String provider) {
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-        };
-
-        locationListenerNetwork = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                timer1.cancel();
-                locationResult.gotLocation(location);
-                mLocationManager.removeUpdates(this);
-                mLocationManager.removeUpdates(locationListenerGps);
-            }
-
-            public void onProviderDisabled(String provider) {
-            }
-
-            public void onProviderEnabled(String provider) {
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-        };
     }
 
     public boolean getLocation(Context context, LocationResult result) {
@@ -94,10 +78,10 @@ public class MyLocation {
         }
 
         if (gps_enabled)
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 8000, 0,
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0,
                     locationListenerGps);
         if (network_enabled)
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0,
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0,
                     locationListenerNetwork);
 
         timer1 = new Timer();
@@ -155,4 +139,5 @@ public class MyLocation {
         }
 
     }
+
 }

@@ -22,8 +22,8 @@ import static com.sisbarra.orienteegame.R.string.medium_target_text;
 
 public class TargetsListCursorAdapter extends CursorAdapter {
 
+    private static int NVIEWTYPES = 3;
     private LayoutInflater mInflater;
-
     private Location mCurrentPos;
 
     //Costruttore

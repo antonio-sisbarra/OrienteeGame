@@ -1,12 +1,10 @@
 package com.sisbarra.orienteegame;
 
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.location.Location;
 import android.location.LocationManager;
@@ -17,8 +15,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -28,14 +24,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import static com.sisbarra.orienteegame.R.style.AppAlertTheme;
 
 //Codice dell'activity principale che contiene le tre sezioni della app
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
+public class MainActivity extends AppCompatActivity {
 
     //Numero di tab nell'app
     private static final int mNTabs = 3;
@@ -88,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         setTabLayout();
 
+        loadDB();
+
     }
 
     @Override
@@ -108,7 +105,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void gotLocation(Location location){
                 //Got the location!
-                //TODO: IMPLEMENTAZIONE
+                //Prendo riferimento al fragment e gli spedisco la location
+                StartGameFragment frag = (StartGameFragment)
+                        mSectionsPagerAdapter.getRegisteredFragment(0);
+                if(frag!=null){
+                    if(location!=null)
+                        frag.updatePos(location);
+                }
             }
         };
         MyLocation myLocation = new MyLocation(mLocationManager, mGpsEnabled, mNetworkEnabled, this);
@@ -117,23 +120,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
         super.onPostResume();
-    }
-
-    /**
-     * Called when a fragment is attached to the activity.
-     * <p>
-     * <p>This is called after the attached fragment's <code>onAttach</code> and before
-     * the attached fragment's <code>onCreate</code> if the fragment has not yet had a previous
-     * call to <code>onCreate</code>.</p>
-     *
-     * @param fragment
-     */
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        if(fragment instanceof HistoryFragment)
-            //Inizializza il DB
-            loadDb();
-        super.onAttachFragment(fragment);
     }
 
     /**
@@ -177,12 +163,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
-    //Inizializza il DB
-    private void loadDb(){
-        //Inizializza il loader dei target-> chiama onCreateLoader
-        getSupportLoaderManager().initLoader(0, null, this);
-        //TODO: ALTRI LOADER
+
+    //Carica il DB in background
+    private void loadDB(){
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    mHelper = new DataBaseHelper(getApplicationContext());
+                    mHelper.createDataBase();
+                } catch (Exception e) {
+                    throw new Error(getString(R.string.error_create_db));
+                }
+                try {
+                    mHelper.openDataBase();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+        }).start();
     }
+
 
     //Verifica se si è connessi a internet e al gps
     private void verifyInternetGps(){
@@ -298,106 +298,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Instantiate and return a new Loader for the given ID.
-     *
-     * @param id   The ID whose loader is to be created.
-     * @param args Any arguments supplied by the caller.
-     * @return Return a new Loader instance that is ready to start loading.
-     */
-    @Override
-    public Loader onCreateLoader(int id, Bundle args) {
-        switch (id) {
-            //Loader dei target
-            case 0: return new android.support.v4.content.CursorLoader(this, null, null, null, null, null) {
-                @Override
-                //In Background carico il db dei target e il cursor relativo
-                public Cursor loadInBackground() {
-                    try {
-                        mHelper = new DataBaseHelper(getContext());
-                        mHelper.createDataBase();
-                    } catch (Exception e) {
-                        throw new Error(getString(R.string.error_create_db));
-                    }
-                    try {
-                        mHelper.openDataBase();
-                    } catch (SQLException sqle) {
-                        throw sqle;
-                    }
-
-                    return mHelper.getAllTargetCursor();
-                }
-            };
-            default: return null;
-        }
-    }
-
-    /**
-     * Called when a previously created loader has finished its load.  Note
-     * that normally an application is <em>not</em> allowed to commit fragment
-     * transactions while in this call, since it can happen after an
-     * activity's state is saved.  See {@link FragmentManager#beginTransaction()
-     * FragmentManager.openTransaction()} for further discussion on this.
-     * <p>
-     * <p>This function is guaranteed to be called prior to the release of
-     * the last data that was supplied for this Loader.  At this point
-     * you should remove all use of the old data (since it will be released
-     * soon), but should not do your own release of the data since its Loader
-     * owns it and will take care of that.  The Loader will take care of
-     * management of its data so you don't have to.  In particular:
-     * <p>
-     * <ul>
-     * <li> <p>The Loader will monitor for changes to the data, and report
-     * them to you through new calls here.  You should not monitor the
-     * data yourself.  For example, if the data is a {@link Cursor}
-     * and you place it in a {@link CursorAdapter}, use
-     * the { CursorAdapter#CursorAdapter(Context, * Cursor, int)} constructor <em>without</em> passing
-     * in either {@link CursorAdapter#FLAG_AUTO_REQUERY}
-     * or {@link CursorAdapter#FLAG_REGISTER_CONTENT_OBSERVER}
-     * (that is, use 0 for the flags argument).  This prevents the CursorAdapter
-     * from doing its own observing of the Cursor, which is not needed since
-     * when a change happens you will get a new Cursor throw another call
-     * here.
-     * <li> The Loader will release the data once it knows the application
-     * is no longer using it.  For example, if the data is
-     * a {@link Cursor} from a {@link CursorLoader},
-     * you should not call close() on it yourself.  If the Cursor is being placed in a
-     * {@link CursorAdapter}, you should use the
-     * {@link CursorAdapter#swapCursor(Cursor)}
-     * method so that the old Cursor is not closed.
-     * </ul>
-     *
-     * @param loader The Loader that has finished.
-     * @param data   The data generated by the Loader.
-     */
-    @Override
-    public void onLoadFinished(Loader loader, Object data) {
-        switch (loader.getId()) {
-            //Caso dei target
-            case 0:
-                Cursor cursor = (Cursor) data;
-                cursor.moveToFirst();
-                mAdapter = new TargetsListCursorAdapter(this, cursor, 0);
-                StartGameFragment frag = (StartGameFragment) mSectionsPagerAdapter.getRegisteredFragment(0);
-                mLstTargets = frag.getListTargets();
-                mLstTargets.setAdapter(mAdapter);
-                //TODO: CAMBIARE TEXT DELLA SECONDA CARD (PRESENTAZIONE OBIETTIVI)
-                break;
-            default: return;
-
-        }
-    }
-
-    /**
-     * Called when a previously created loader is being reset, and thus
-     * making its data unavailable.  The application should at this point
-     * remove any references it has to the Loader's data.
-     *
-     * @param loader The Loader that is being reset.
-     */
-    @Override
-    public void onLoaderReset(Loader loader) {
-
+    //Restituisce l'helper al DB (utile per i fragment)
+    public DataBaseHelper getHelper(){
+        return mHelper;
     }
 
     /**
