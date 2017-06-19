@@ -23,6 +23,7 @@ import static com.sisbarra.orienteegame.MainActivity.PREFERENCE_FILENAME;
 
 public class CreateUserDialogFragment extends AppCompatDialogFragment {
 
+
     public CreateUserDialogFragment() {
         // Empty constructor is required for DialogFragment
         // Make sure not to add arguments to the constructor
@@ -98,8 +99,6 @@ public class CreateUserDialogFragment extends AppCompatDialogFragment {
         prefEditor.putBoolean(getString(R.string.first_time_pref), false);
 
         prefEditor.apply();
-
-        //TODO: AGGIORNARE LA TEXTVIEW NEL PRIMO FRAGMENT
     }
 
     private String verifyText(){

@@ -20,6 +20,7 @@
     <!-- Nomi delle preferences -->
     <string name="first_time_pref">firstTime</string>
     <string name="username_pref">username</string>
+    <string name="points_pref">points</string>
 
     <!-- Nomi delle tabelle del db -->
     <string name="name_table_targets">Targets</string>

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -20,12 +21,14 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatTextView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 
+import static com.sisbarra.orienteegame.MainActivity.PREFERENCE_FILENAME;
 
 
 /**
@@ -34,6 +37,20 @@ import android.widget.ListView;
  */
 public class StartGameFragment extends Fragment implements LoaderCallbacks {
 
+    //Definisco il listener sulle shared preferences
+    private final SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener
+            = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            //Aggiorna la textview con user o punti nuovi
+            if (key.contentEquals(getString(R.string.username_pref))
+                || key.contentEquals(getString(R.string.points_pref))){
+                String user = sharedPreferences.getString(getString(R.string.username_pref), "");
+                int points = sharedPreferences.getInt(getString(R.string.points_pref), 0);
+                setPointInfoText("Ciao " +user+ ", hai totalizzato fino adesso " +points+ " punti");
+            }
+        }
+    };
     private LocationManager mLocationManager;
     private ListView mLstTargets;
     private TargetsListCursorAdapter mAdapter;
@@ -78,6 +95,13 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
      */
     public static StartGameFragment newInstance() {
         return new StartGameFragment();
+    }
+
+    //Metodo che dato del testo modifica la sezione info punti
+    public void setPointInfoText(String text){
+        AppCompatTextView txtView = (AppCompatTextView)
+                getActivity().findViewById(R.id.totalpointstext);
+        txtView.setText(text);
     }
 
     @Override
@@ -224,6 +248,21 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
     //Faccio override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mLstTargets = (ListView) getActivity().findViewById(R.id.lstTargets);
+
+        //Registro il listener delle shared pref
+        getActivity().getSharedPreferences(PREFERENCE_FILENAME,
+                Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(
+                mSharedPreferenceChangeListener);
+
+        //Prende dalle pref user e punti
+        SharedPreferences gameSettings = getActivity().getSharedPreferences(
+                PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        String user = gameSettings.getString(getString(R.string.username_pref), "");
+        int points = gameSettings.getInt(getString(R.string.points_pref), 0);
+
+        //Setta la sezione info
+        setPointInfoText("Ciao " +user+ ", hai totalizzato fino adesso " +points+ " punti");
+
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -331,4 +370,6 @@ public class StartGameFragment extends Fragment implements LoaderCallbacks {
     public void onLoaderReset(Loader loader) {
 
     }
+
+
 }

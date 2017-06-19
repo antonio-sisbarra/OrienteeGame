@@ -18,9 +18,11 @@ import android.widget.TextView;
 //Codice dell'activity principale che contiene le tre sezioni della app
 public class MainActivity extends AppCompatActivity {
 
+    //Numero di tab nell'app
     private static final int mNTabs = 3;
     //Nome delle preferences
     public static String PREFERENCE_FILENAME = null;
+
     /**
      * Il {@link android.support.v4.view.PagerAdapter} che fornirà
      * i fragments per ognuna delle sezioni. Uso una sottoclasse di
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
      * Il {@link ViewPager} che contiene i contenuti.
      */
     private ViewPager mViewPager;
+
     private Toolbar mToolbar;
     private TabLayout mTabLayout;
     private SharedPreferences gameSettings;
@@ -50,11 +53,29 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        PREFERENCE_FILENAME = getString(R.string.filename_pref);
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
+        setTabLayout();
+
+        //TODO: DEVO INIZIALIZZARE QUI IL DB? (MAGARI IN UN THREAD SEPARATO)
+
+        //TODO: Verifica dei permessi necessari (comprese API Google)
+
+        //TODO: Verifica della connessione a internet e gps
+
+    }
+
+    @Override
+    protected void onStart() {
+        //Verifica dell'username e se siamo al primo utilizzo del gioco -> Dialog
+        getUserInfo();
+
+        super.onStart();
+    }
+
+    //Setta tutto il layout relativo alle tab
+    private void setTabLayout(){
         // Crea l'adapter che restituirà un fragment per ognuno delle tre
         // sezioni primarie dell'activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -68,20 +89,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Setta le icone con testo per le tab (sono custom)
         setupTabIcons();
-
-        //TODO: DEVO INIZIALIZZARE QUI IL DB? (MAGARI IN UN THREAD SEPARATO)
-
-        //TODO: Verifica dei permessi necessari (comprese API Google)
-
-        //TODO: Verifica della connessione a internet e gps
-
-        //TODO: Verifica dell'username e se siamo al primo utilizzo del gioco -> Dialog
-        verifyFirstTime();
-
     }
 
     //Verifica se l'utente è la prima volta che gioca, e in caso si provvede a prendere l'username
-    private void verifyFirstTime(){
+    private void getUserInfo(){
+        PREFERENCE_FILENAME = getString(R.string.filename_pref);
         gameSettings = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
         Boolean first = gameSettings.getBoolean(getString(R.string.first_time_pref), true);
         if(first)
@@ -92,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
     //Mostra un dialog per prendere l'user
     private void showCreateUserDialog(){
         FragmentManager fm = getSupportFragmentManager();
-        CreateUserDialogFragment editNameDialogFragment = CreateUserDialogFragment.newInstance(getString(R.string.create_user_title_dialog));
+        CreateUserDialogFragment editNameDialogFragment =
+                CreateUserDialogFragment.newInstance(getString(R.string.create_user_title_dialog));
         editNameDialogFragment.show(fm, getString(R.string.create_user_title_dialog));
     }
 
