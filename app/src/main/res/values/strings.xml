@@ -12,7 +12,7 @@
     <string name="create_user_title_dialog">Username</string>
     <string name="confirm_text_dialog">Conferma</string>
     <string name="no_exit_user">Devi inserire uno username valido!</string>
-    <string name="gps_request">Il GPS sembra spento, lo vuoi attivare per giocare?</string>
+    <string name="open_location_settings">Apri localizzazione</string>
     <string name="easy_target_text">Obiettivo facile</string>
     <string name="medium_target_text">Obiettivo medio</string>
     <string name="hard_target_text">Obiettivo difficile</string>
@@ -28,6 +28,8 @@
     <!-- Errori -->
     <string name="error_copy_db">Errore nel copiare il database</string>
     <string name="error_create_db">Errore nel creare il database</string>
+    <string name="gps_network_not_enabled">Rete e gps non attiva, almeno la rete deve essere attiva
+    </string>
 
     <!-- Loading per le textview -->
     <string name="loading_textview">Caricamento in corso..</string>

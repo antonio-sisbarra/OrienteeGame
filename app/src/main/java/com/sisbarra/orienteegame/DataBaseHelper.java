@@ -56,7 +56,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             this.getReadableDatabase();
 
             try {
-                //TODO: QUI SUCCEDE UN PROBLEMA OCCHIO!!
                 copyDataBase();
             }
             catch (IOException e) {
