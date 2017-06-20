@@ -334,7 +334,6 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             //Faccio uno switch sulla position (0 game, 1 others, 2 history
             switch (position){
-                //TODO: DARE RIFERIMENTO AL DB AI FRAGMENT
                 case 0: return StartGameFragment.newInstance();
                 case 1: return OthersFragment.newInstance("pippo", "cacca");
                 case 2: return HistoryFragment.newInstance("Ue");
