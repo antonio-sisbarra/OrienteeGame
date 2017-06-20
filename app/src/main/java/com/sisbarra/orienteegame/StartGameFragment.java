@@ -102,6 +102,11 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
         }
     }
 
+    //Metodo che chiama la mainactivity per capire se l'adapter è stato creato
+    public boolean isThereAdapter(){
+        return (mAdapter != null);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

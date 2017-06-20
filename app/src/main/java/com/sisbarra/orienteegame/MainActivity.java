@@ -119,8 +119,8 @@ public class MainActivity extends AppCompatActivity {
                     if(location!=null) {
                         frag.updatePos(location);
 
-                        //Se è la prima volta
-                        if(!mHaveLoc){
+                        //Se è la prima volta e ho un adapter pronto
+                        if(!mHaveLoc && frag.isThereAdapter()){
                             mHaveLoc = true;
                             runOnUiThread(new Runnable() {
                                 @Override
