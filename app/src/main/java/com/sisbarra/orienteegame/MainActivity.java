@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     //Flag per capire se GPS e Netw sono attivi
     private boolean mGpsEnabled;
     private boolean mNetworkEnabled;
+    private boolean mInternetEnabled;
     //Riferimenti per il caricamento del DB
     private ListView mLstTargets;
     private TargetsListCursorAdapter mAdapter;
@@ -204,6 +207,8 @@ public class MainActivity extends AppCompatActivity {
     private void verifyInternetGps(){
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
+        mInternetEnabled = isInternetAvailable();
+
         try {
             mGpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         } catch(Exception ex) {}
@@ -233,6 +238,36 @@ public class MainActivity extends AppCompatActivity {
             dialog.show();
         }
 
+        if(!mInternetEnabled){
+            // notify user
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this, AppAlertTheme);
+            dialog.setMessage(this.getResources().getString(R.string.connection_not_enabled));
+            dialog.setPositiveButton(this.getResources().getString(R.string.open_connection_settings),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                            Intent myIntent = new Intent(Settings.ACTION_SETTINGS);
+                            startActivity(myIntent);
+                        }
+                    });
+            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    finish();
+                }
+            });
+            dialog.show();
+        }
+
+    }
+
+    //Verifica se si è connessi a internet
+    public boolean isInternetAvailable() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     //Setta tutto il layout relativo alle tab

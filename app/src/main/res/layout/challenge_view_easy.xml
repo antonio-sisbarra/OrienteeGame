@@ -11,11 +11,14 @@
         android:id="@+id/challengeiconeasy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/faccina_sorridente"
         android:src="@drawable/ic_easy_challenge"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/fab_margin"
+        android:layout_marginStart="@dimen/fab_margin"
         android:orientation="vertical">
 
         <TextView
