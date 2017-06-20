@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int mNTabs = 3;
     //Nome delle preferences
     public static String PREFERENCE_FILENAME = null;
+    //Costante per il numero di pagine massimo in memoria
+    static int MAXPAGESINMEMORY = 2;
     //Riferimento al location manager di sistema
     private LocationManager mLocationManager;
     /**
@@ -241,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Setta il viewpager con l'adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setOffscreenPageLimit(MAXPAGESINMEMORY);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
