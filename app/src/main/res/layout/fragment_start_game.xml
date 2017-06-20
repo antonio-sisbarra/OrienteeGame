@@ -74,6 +74,21 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/font_size_text_hello_game"/>
 
+            <!-- Progress bar per il caricamento dei target -->
+            <RelativeLayout
+                android:id="@+id/loadingTargetPanel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center" >
+
+                <ProgressBar
+                    android:id="@+id/loadingTargetProgressbar"
+                    style="@android:style/Widget.ProgressBar.Inverse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="true"/>
+            </RelativeLayout>
+
             <!-- ListView con le tipologie di partite disponibili -->
             <ListView
                 android:id="@+id/lstTargets"

@@ -25,6 +25,7 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                                     frag.setTargetText(getString(R.string.header_target_text));
                                     mMyLocation.setDistanceForUpdates(getApplicationContext(),
                                             mLocationResult, MINDISTANCE);
+                                    findViewById(R.id.loadingTargetPanel).setVisibility(View.GONE);
                                 }
                             });
                         }
