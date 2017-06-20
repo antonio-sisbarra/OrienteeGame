@@ -14,7 +14,7 @@ import android.widget.TextView;
  * Adapter che prende i target dal db e li spara sulla listview
  */
 
-public class TargetsListCursorAdapter extends CursorAdapter {
+class TargetsListCursorAdapter extends CursorAdapter {
 
     private static int NVIEWTYPES = 3;
     private LayoutInflater mInflater;
@@ -58,7 +58,7 @@ public class TargetsListCursorAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        //Controllo se esiste una posizione attuale
+        //Controllo se esiste una posizione attuale e prevedo situazione di view null (filtro)
         if(mCurrentPos==null)
             return;
 
