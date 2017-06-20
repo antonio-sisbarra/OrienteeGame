@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             public void gotLocation(Location location){
                 //Got the location!
                 //Prendo riferimento al fragment e gli spedisco la location
-                StartGameFragment frag = (StartGameFragment)
+                final StartGameFragment frag = (StartGameFragment)
                         mSectionsPagerAdapter.getRegisteredFragment(0);
                 if(frag!=null){
                     if(location!=null) {
@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    frag.setTargetText(getString(R.string.header_target_text));
                                     mMyLocation.setDistanceForUpdates(getApplicationContext(),
                                             mLocationResult, MINDISTANCE);
                                 }

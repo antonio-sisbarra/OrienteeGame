@@ -74,7 +74,7 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/font_size_text_hello_game"/>
 
-            <!-- TODO:ListView con le tipologie di partite disponibili -->
+            <!-- ListView con le tipologie di partite disponibili -->
             <ListView
                 android:id="@+id/lstTargets"
                 android:layout_width="wrap_content"

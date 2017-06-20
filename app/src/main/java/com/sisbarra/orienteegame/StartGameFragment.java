@@ -88,7 +88,6 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
                 @Override
                 public void run() {
                     mLstTargets.setAdapter(mAdapter);
-                    setTargetText(getString(R.string.header_target_text));
                 }
             });
 
