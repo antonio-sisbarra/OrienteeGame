@@ -33,7 +33,7 @@
     </string>
 
     <!-- Loading per le textview -->
-    <string name="loading_textview">Caricamento in corso..</string>
+    <string name="loading_textview">In attesa della posizione..</string>
 
     <!-- Numero di righe nella listview delle sfide -->
     <integer name="nrow_challenges">3</integer>

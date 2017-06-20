@@ -23,17 +23,6 @@ public class MyLocation {
     LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
-    LocationListener locationListenerNetwork = new LocationListener() {
-        public void onLocationChanged(Location location) {
-            timer1.cancel();
-            locationResult.gotLocation(location);
-            mLocationManager.removeUpdates(this);
-            mLocationManager.removeUpdates(locationListenerGps);
-        }
-        public void onProviderDisabled(String provider) {}
-        public void onProviderEnabled(String provider) {}
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
-    };
     //I listener
     LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
@@ -41,6 +30,17 @@ public class MyLocation {
             locationResult.gotLocation(location);
             mLocationManager.removeUpdates(this);
             mLocationManager.removeUpdates(locationListenerNetwork);
+        }
+        public void onProviderDisabled(String provider) {}
+        public void onProviderEnabled(String provider) {}
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+    };
+    LocationListener locationListenerNetwork = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            timer1.cancel();
+            locationResult.gotLocation(location);
+            mLocationManager.removeUpdates(this);
+            mLocationManager.removeUpdates(locationListenerGps);
         }
         public void onProviderDisabled(String provider) {}
         public void onProviderEnabled(String provider) {}
@@ -85,7 +85,7 @@ public class MyLocation {
                     locationListenerNetwork);
 
         timer1 = new Timer();
-        timer1.schedule(new GetLastLocation(), 20000);
+        timer1.schedule(new GetLastLocation(), 15000);
         return true;
     }
 

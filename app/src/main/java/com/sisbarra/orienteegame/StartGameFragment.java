@@ -68,21 +68,38 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
         txtView.setText(text);
     }
 
-    //Setta la textview per obiettivi
-    private void setTextView(){
-        AppCompatTextView text = (AppCompatTextView) getActivity().findViewById(R.id.targetTxt);
-        text.setText(R.string.header_target_text);
-    }
-
     //Restituisce la lista dei target alla mainactivity
     public ListView getListTargets(){
         return mLstTargets;
     }
 
+    //Modifica la textview degli obiettivi
+    public void setTargetText(String text){
+        AppCompatTextView txtView = (AppCompatTextView)
+                getActivity().findViewById(R.id.targetTxt);
+        txtView.setText(text);
+    }
+
     //Metodo che aggiorna la posizione attuale nel cursoradapter
     public void updatePos(Location location){
+        //Verifico se è giaà stato settato un adapter
+        if(mLstTargets.getAdapter()==null)
+            (getActivity()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mLstTargets.setAdapter(mAdapter);
+                    setTargetText(getString(R.string.header_target_text));
+                }
+            });
+
         mAdapter.setCurrentLocation(location);
-        mAdapter.notifyDataSetChanged();
+        (getActivity()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(mAdapter!=null)
+                    mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -218,10 +235,6 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
         Cursor cursor = (Cursor) data;
         cursor.moveToFirst();
         mAdapter = new TargetsListCursorAdapter(getContext(), cursor, 0);
-        mLstTargets.setAdapter(mAdapter);
-
-        //Quando finisco il caricamento del cursor mostro la textview per obiettivi
-        setTextView();
     }
 
     /**

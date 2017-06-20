@@ -3,17 +3,11 @@ package com.sisbarra.orienteegame;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import static com.sisbarra.orienteegame.R.string.easy_target_text;
-import static com.sisbarra.orienteegame.R.string.hard_target_text;
-import static com.sisbarra.orienteegame.R.string.medium_target_text;
 
 /**
  * Created by Antonio Sisbarra on 17/06/2017.
@@ -44,7 +38,15 @@ public class TargetsListCursorAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.challenge_view, parent, false);
+        switch (getItemViewType(cursor.getPosition())){
+            case 0: return LayoutInflater.from(context).inflate(R.layout.challenge_view_easy,
+                    parent, false);
+            case 1: return LayoutInflater.from(context).inflate(R.layout.challenge_view_medium,
+                    parent, false);
+            case 2: return LayoutInflater.from(context).inflate(R.layout.challenge_view_hard,
+                    parent, false);
+            default: return null;
+        }
     }
 
     /**
@@ -63,40 +65,16 @@ public class TargetsListCursorAdapter extends CursorAdapter {
         //Calcola distanza dall'obiettivo in m
         int distance = calculateDistance(cursor);
 
-        //Calcola difficoltà
-        int diff = calculateDiff(distance);
-
         //Setta la view
-        setTheView(view, context, distance, diff);
+        setTheView(view, context, distance);
 
     }
 
-    //Setta la vista in base alla distanza e alla difficoltà
-    private void setTheView(View view, Context context, int dist, int diff){
-        ImageView img = (ImageView) view.findViewById(R.id.challengeicon);
-        TextView diftxt = (TextView) view.findViewById(R.id.difficultytext);
+    //Setta la vista in base alla distanza
+    private void setTheView(View view, Context context, int dist){
         TextView distxt = (TextView) view.findViewById(R.id.distancetext);
 
-        switch (diff){
-            case 0:{
-                //Obiettivo facile
-                img.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_easy_challenge));
-                diftxt.setText(context.getText(easy_target_text));
-                distxt.setText(new StringBuilder().append("Sei distante ").append(dist).append(" m dall'obiettivo").toString());
-            }
-            case 1:{
-                //Obiettivo medio
-                img.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_medium_challenge));
-                diftxt.setText(context.getText(medium_target_text));
-                distxt.setText(new StringBuilder().append("Sei distante ").append(dist).append(" m dall'obiettivo").toString());
-            }
-            case 2:{
-                //Obiettivo hard
-                img.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_hard_challenge));
-                diftxt.setText(context.getText(hard_target_text));
-                distxt.setText(new StringBuilder().append("Sei distante ").append(dist).append(" m dall'obiettivo").toString());
-            }
-        }
+        distxt.setText(new StringBuilder().append("Sei distante ").append(dist).append(" m dall'obiettivo").toString());
     }
 
     //Calcola difficoltà in base alla distanza (500m 0, 1500m 1, else 2)
@@ -140,5 +118,16 @@ public class TargetsListCursorAdapter extends CursorAdapter {
             mCurrentPos = new Location(loc);
         else
             mCurrentPos.set(loc);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mCurrentPos==null) return 0;
+        else return calculateDiff(calculateDistance((Cursor) getItem(position)));
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return NVIEWTYPES;
     }
 }
