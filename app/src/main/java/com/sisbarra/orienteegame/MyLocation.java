@@ -18,29 +18,25 @@ import java.util.TimerTask;
  * Classe che incapsula il lavoro di procacciamento della posizione attuale
  */
 
-public class MyLocation {
+class MyLocation {
 
-    LocationResult locationResult;
+    private LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
     //I listener
-    LocationListener locationListenerGps = new LocationListener() {
+    private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
             timer1.cancel();
             locationResult.gotLocation(location);
-            mLocationManager.removeUpdates(this);
-            mLocationManager.removeUpdates(locationListenerNetwork);
         }
         public void onProviderDisabled(String provider) {}
         public void onProviderEnabled(String provider) {}
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     };
-    LocationListener locationListenerNetwork = new LocationListener() {
+    private LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
             timer1.cancel();
             locationResult.gotLocation(location);
-            mLocationManager.removeUpdates(this);
-            mLocationManager.removeUpdates(locationListenerGps);
         }
         public void onProviderDisabled(String provider) {}
         public void onProviderEnabled(String provider) {}
@@ -50,14 +46,14 @@ public class MyLocation {
     private boolean network_enabled;
     private Activity mActivity;
 
-    public MyLocation(LocationManager lm, boolean gps_enab, boolean netw_enab, Activity activ) {
+    MyLocation(LocationManager lm, boolean gps_enab, boolean netw_enab, Activity activ) {
         mLocationManager = lm;
         gps_enabled = gps_enab;
         network_enabled = netw_enab;
         mActivity = activ;
     }
 
-    public boolean getLocation(Context context, LocationResult result) {
+    boolean getLocation(Context context, LocationResult result) {
         //Uso la callback di location result per passare la posizione attuale all'utente
         locationResult = result;
 
@@ -78,10 +74,10 @@ public class MyLocation {
         }
 
         if (gps_enabled)
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0,
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0,
                     locationListenerGps);
         if (network_enabled)
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0,
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 8000, 0,
                     locationListenerNetwork);
 
         timer1 = new Timer();
@@ -89,15 +85,50 @@ public class MyLocation {
         return true;
     }
 
-    public static abstract class LocationResult {
+    //Con questo metodo setto anche un fattore di cambio posizione nel location updates
+    boolean setDistanceForUpdates(Context context, LocationResult result, int minDistance){
+        //Uso la callback di location result per passare la posizione attuale all'utente
+        locationResult = result;
+
+        //Rimuovo i precedenti updates
+        mLocationManager.removeUpdates(locationListenerGps);
+        mLocationManager.removeUpdates(locationListenerNetwork);
+
+        //don't start listeners if no provider is enabled
+        if (!gps_enabled && !network_enabled)
+            return false;
+
+        //Controllo esplicitamente i permessi
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(mActivity,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
+
+        }
+
+        if (gps_enabled)
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 9000, minDistance,
+                    locationListenerGps);
+        if (network_enabled)
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 14000, minDistance,
+                    locationListenerNetwork);
+
+        timer1 = new Timer();
+        timer1.schedule(new GetLastLocation(), 30000);
+        return true;
+    }
+
+    static abstract class LocationResult {
         public abstract void gotLocation(Location location);
     }
 
-    class GetLastLocation extends TimerTask {
+    private class GetLastLocation extends TimerTask {
         @Override
         public void run() {
-            mLocationManager.removeUpdates(locationListenerGps);
-            mLocationManager.removeUpdates(locationListenerNetwork);
 
             Location net_loc = null, gps_loc = null;
 

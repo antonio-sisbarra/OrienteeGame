@@ -32,13 +32,14 @@ import static com.sisbarra.orienteegame.R.style.AppAlertTheme;
 //Codice dell'activity principale che contiene le tre sezioni della app
 public class MainActivity extends AppCompatActivity {
 
+    //Costante per la mindistance per listener della posizione
+    public static final int MINDISTANCE = 5;
     //Numero di tab nell'app
     private static final int mNTabs = 3;
     //Nome delle preferences
     public static String PREFERENCE_FILENAME = null;
     //Riferimento al location manager di sistema
     private LocationManager mLocationManager;
-
     /**
      * Il {@link android.support.v4.view.PagerAdapter} che fornirà
      * i fragments per ognuna delle sezioni. Uso una sottoclasse di
@@ -50,28 +51,28 @@ public class MainActivity extends AppCompatActivity {
      * Il {@link ViewPager} che contiene i contenuti.
      */
     private ViewPager mViewPager;
-
     private Toolbar mToolbar;
     private TabLayout mTabLayout;
     private SharedPreferences gameSettings;
-
     //Flag per capire se GPS e Netw sono attivi
     private boolean mGpsEnabled;
     private boolean mNetworkEnabled;
-
     //Riferimenti per il caricamento del DB
     private ListView mLstTargets;
     private TargetsListCursorAdapter mAdapter;
     private DataBaseHelper mHelper;
-
+    //Listener della posizione
+    private MyLocation.LocationResult mLocationResult;
+    //Oggetto che si interfaccia per la posizione
+    private MyLocation mMyLocation;
+    //Flag per vedere se ho preso già una location
+    private boolean mHaveLoc = false;
     /* Vettore di id di icona per le sezioni */
     private int[] mTabIcons = {
             android.R.drawable.ic_menu_compass,
             android.R.drawable.ic_menu_mapmode,
             android.R.drawable.ic_menu_myplaces
     };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         verifyInternetGps();
 
         //Registro il listener della posizione
-        MyLocation.LocationResult locationResult = new MyLocation.LocationResult(){
+        mLocationResult = new MyLocation.LocationResult(){
             @Override
             public void gotLocation(Location location){
                 //Got the location!
@@ -109,13 +110,26 @@ public class MainActivity extends AppCompatActivity {
                 StartGameFragment frag = (StartGameFragment)
                         mSectionsPagerAdapter.getRegisteredFragment(0);
                 if(frag!=null){
-                    if(location!=null)
+                    if(location!=null) {
                         frag.updatePos(location);
+
+                        //Se è la prima volta
+                        if(!mHaveLoc){
+                            mHaveLoc = true;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mMyLocation.setDistanceForUpdates(getApplicationContext(),
+                                            mLocationResult, MINDISTANCE);
+                                }
+                            });
+                        }
+                    }
                 }
             }
         };
-        MyLocation myLocation = new MyLocation(mLocationManager, mGpsEnabled, mNetworkEnabled, this);
-        myLocation.getLocation(this, locationResult);
+        mMyLocation = new MyLocation(mLocationManager, mGpsEnabled, mNetworkEnabled, this);
+        mMyLocation.getLocation(this, mLocationResult);
 
 
 

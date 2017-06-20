@@ -82,7 +82,7 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
 
     //Metodo che aggiorna la posizione attuale nel cursoradapter
     public void updatePos(Location location){
-        //Verifico se è giaà stato settato un adapter
+        //Verifico se è già stato settato un adapter
         if(mLstTargets.getAdapter()==null)
             (getActivity()).runOnUiThread(new Runnable() {
                 @Override
@@ -92,14 +92,15 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
                 }
             });
 
-        mAdapter.setCurrentLocation(location);
-        (getActivity()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if(mAdapter!=null)
-                    mAdapter.notifyDataSetChanged();
-            }
-        });
+        if(mAdapter!=null) {
+            mAdapter.setCurrentLocation(location);
+            (getActivity()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                        mAdapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     @Override

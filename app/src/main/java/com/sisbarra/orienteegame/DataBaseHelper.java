@@ -18,11 +18,11 @@ import java.io.OutputStream;
  * Sotto classe che mi serve per operare con il database dei target
  */
 
-public class DataBaseHelper extends SQLiteOpenHelper {
+class DataBaseHelper extends SQLiteOpenHelper {
 
-    public static String LAT_COLUMN = "lat";
-    public static String LONG_COLUMN = "long";
-    public static String ID_COLUMN = "_id";
+    static String LAT_COLUMN = "lat";
+    static String LONG_COLUMN = "long";
+    private static String ID_COLUMN = "_id";
 
     //The Android's default system path of my application database.
     private static String DB_PATH;
@@ -46,7 +46,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     /**
      * Crea un db vuoto nel sistema, e lo riscrive con il mio db
      * */
-    public void createDataBase() throws IOException {
+    void createDataBase() throws IOException {
 
         boolean dbExist = checkDataBase();
 
@@ -117,7 +117,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     //Apre il db
-    public void openDataBase() throws SQLException {
+    void openDataBase() throws SQLException {
         String myPath = DB_PATH + DB_NAME;
         myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
     }
@@ -149,7 +149,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public Cursor getAllTargetCursor(){
+    Cursor getAllTargetCursor(){
 
         return myDataBase.query(true, myContext.getString(R.string.name_table_targets),
                 new String[]{ID_COLUMN, LAT_COLUMN, LONG_COLUMN}, null, null, null, null, null, null);
