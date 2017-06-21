@@ -101,6 +101,18 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
     }
 
+    /**
+     * Dispatch onPause() to fragments.
+     */
+    @Override
+    protected void onPause() {
+        //Rimuovo il listener della posizione
+        if(mMyLocation!=null)
+            mMyLocation.removeUpdates();
+
+        super.onPause();
+    }
+
     @Override
     protected void onPostResume() {
         //Verifica dell'username e se siamo al primo utilizzo del gioco -> Dialog

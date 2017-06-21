@@ -109,6 +109,14 @@ class MyLocation {
         return true;
     }
 
+    //Rimuove i listener dall'ascolto degli aggiornamenti
+    void removeUpdates(){
+        if(mLocationManager!=null) {
+            mLocationManager.removeUpdates(locationListenerGps);
+            mLocationManager.removeUpdates(locationListenerNetwork);
+        }
+    }
+
     static abstract class LocationResult {
         public abstract void gotLocation(Location location);
     }
