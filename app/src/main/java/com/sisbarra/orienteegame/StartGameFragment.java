@@ -2,6 +2,7 @@ package com.sisbarra.orienteegame;
 
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
@@ -15,6 +16,7 @@ import android.support.v7.widget.AppCompatTextView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 
@@ -27,6 +29,12 @@ import static com.sisbarra.orienteegame.MainActivity.PREFERENCE_FILENAME;
  */
 public class StartGameFragment extends Fragment implements LoaderManager.LoaderCallbacks {
 
+    private LocationManager mLocationManager;
+    private ListView mLstTargets;
+    //Riferimento al DB
+    private DataBaseHelper mHelper;
+    //Riferimento all'Activity Main
+    private MainActivity mMainActivity;
     //Definisco il listener sulle shared preferences
     private final SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener
             = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -41,12 +49,6 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
             }
         }
     };
-    private LocationManager mLocationManager;
-    private ListView mLstTargets;
-
-    //Riferimento al DB
-    private DataBaseHelper mHelper;
-
     //CursorAdapter per i target
     private TargetsListCursorAdapter mAdapter;
 
@@ -64,7 +66,7 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
     //Metodo che dato del testo modifica la sezione info punti
     public void setPointInfoText(String text){
         AppCompatTextView txtView = (AppCompatTextView)
-                getActivity().findViewById(R.id.totalpointstext);
+                mMainActivity.findViewById(R.id.totalpointstext);
         txtView.setText(text);
     }
 
@@ -76,7 +78,7 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
     //Modifica la textview degli obiettivi
     public void setTargetText(String text){
         AppCompatTextView txtView = (AppCompatTextView)
-                getActivity().findViewById(R.id.targetTxt);
+                mMainActivity.findViewById(R.id.targetTxt);
         txtView.setText(text);
     }
 
@@ -84,22 +86,52 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
     public void updatePos(Location location){
         //Verifico se è già stato settato un adapter
         if(mLstTargets.getAdapter()==null)
-            (getActivity()).runOnUiThread(new Runnable() {
+            (mMainActivity).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mLstTargets.setAdapter(mAdapter);
+                    setAdapterAndListener();
                 }
             });
 
         if(mAdapter!=null) {
             mAdapter.setCurrentLocation(location);
-            (getActivity()).runOnUiThread(new Runnable() {
+            (mMainActivity).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                         mAdapter.notifyDataSetChanged();
                 }
             });
         }
+    }
+
+    //Metodo che setta adapter e listener per la Listview dei target
+    private void setAdapterAndListener(){
+        mLstTargets.setAdapter(mAdapter);
+        mLstTargets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //TODO: PRENDO OGGETTO COLLEGATO ALLA POSIZIONE
+                //TODO: FACCIO PARTIRE ACTIVITY DELLA BUSSOLA
+                startGamingActivity((Cursor) mAdapter.getItem(position));
+            }
+        });
+    }
+
+    //Fa partire la gaming activity estrapolando i dati necessari
+    private void startGamingActivity(Cursor c){
+        //Eseguo tutto su un thread in background per motivi di efficienza
+        final Cursor curs = c;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                double lat = curs.getDouble(curs.getColumnIndex(DataBaseHelper.LAT_COLUMN));
+                double lng = curs.getDouble(curs.getColumnIndex(DataBaseHelper.LONG_COLUMN));
+                Intent intent = new Intent(getContext(), GamingActivity.class);
+                intent.putExtra(getString(R.string.lat_intent_gaming), lat);
+                intent.putExtra(getString(R.string.long_intent_gaming), lng);
+                startActivity(intent);
+            }
+        }).start();
     }
 
     //Metodo che chiama la mainactivity per capire se l'adapter è stato creato
@@ -111,7 +143,7 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mHelper = ((MainActivity) getActivity()).getHelper();
+        mHelper = mMainActivity.getHelper();
     }
 
     /**
@@ -143,6 +175,18 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     /**
+     * Called when a fragment is first attached to its context.
+     * {@link #onCreate(Bundle)} will be called after this.
+     *
+     * @param context
+     */
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mMainActivity = (MainActivity) getActivity();
+    }
+
+    /**
      * Called immediately after {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}
      * has returned, but before any saved state has been restored in to the view.
      * This gives subclasses a chance to initialize themselves once
@@ -155,18 +199,18 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     //Faccio override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        mLstTargets = (ListView) getActivity().findViewById(R.id.lstTargets);
+        mLstTargets = (ListView) mMainActivity.findViewById(R.id.lstTargets);
 
         //Fa partire il loader dei target
-        getActivity().getSupportLoaderManager().initLoader(1, null, this);
+        mMainActivity.getSupportLoaderManager().initLoader(1, null, this);
 
         //Registro il listener delle shared pref
-        getActivity().getSharedPreferences(PREFERENCE_FILENAME,
+        mMainActivity.getSharedPreferences(PREFERENCE_FILENAME,
                 Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(
                 mSharedPreferenceChangeListener);
 
         //Prende dalle pref user e punti
-        SharedPreferences gameSettings = getActivity().getSharedPreferences(
+        SharedPreferences gameSettings = mMainActivity.getSharedPreferences(
                 PREFERENCE_FILENAME, Context.MODE_PRIVATE);
         String user = gameSettings.getString(getString(R.string.username_pref), "");
         int points = gameSettings.getInt(getString(R.string.points_pref), 0);

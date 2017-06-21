@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private MyLocation.LocationResult mLocationResult;
     //Oggetto che si interfaccia per la posizione
     private MyLocation mMyLocation;
+    //Ultima location ricevuta
+    private Location mLastLocation;
     //Flag per vedere se ho preso già una location
     private boolean mHaveLoc = false;
     /* Vettore di id di icona per le sezioni */
@@ -117,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
                         mSectionsPagerAdapter.getRegisteredFragment(0);
                 if(frag!=null){
                     if(location!=null) {
+                        //Aggiorno la lastlocation(utile per l'activity gioco)
+                        if(mLastLocation == null) mLastLocation = new Location(location);
+                        else mLastLocation.set(location);
+
                         frag.updatePos(location);
 
                         //Se è la prima volta e ho un adapter pronto
@@ -138,8 +144,6 @@ public class MainActivity extends AppCompatActivity {
         };
         mMyLocation = new MyLocation(mLocationManager, this);
         mMyLocation.getLocation(this, mLocationResult);
-
-
 
         super.onPostResume();
     }
@@ -328,6 +332,15 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.getTabAt(2).setCustomView(tabThree);
     }
 
+    //Restituisce l'helper al DB (utile per i fragment)
+    DataBaseHelper getHelper(){
+        return mHelper;
+    }
+
+    //Restituisce un riferimento alla MyLocation (utile per activity di gioco)
+    Location getLastKnownLocation(){
+        return mLastLocation;
+    }
 
     @Override
     //TODO: DA IMPLEMENTARE ANCORA
@@ -353,11 +366,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    //Restituisce l'helper al DB (utile per i fragment)
-    public DataBaseHelper getHelper(){
-        return mHelper;
-    }
-
     /**
      * Un {@link FragmentPagerAdapter} che restituisce il fragment corrispondente a
      * una sezione.
@@ -376,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
             //Faccio uno switch sulla position (0 game, 1 others, 2 history
             switch (position){
                 case 0: return StartGameFragment.newInstance();
+                //TODO: DA COMPLETARE
                 case 1: return OthersFragment.newInstance("pippo", "cacca");
                 case 2: return HistoryFragment.newInstance("Ue");
                 default: return StartGameFragment.newInstance();

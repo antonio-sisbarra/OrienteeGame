@@ -46,4 +46,10 @@
     <string name="faccina_sorridente">Faccina sorridente</string>
     <string name="faccina_neutrale">Faccina neutrale</string>
     <string name="faccina_triste">Faccina triste</string>
+
+    <string name="title_activity_gaming">GamingActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="long_intent_gaming">long</string>
+    <string name="lat_intent_gaming">lat</string>
 </resources>
