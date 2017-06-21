@@ -53,7 +53,7 @@ class DataBaseHelper extends SQLiteOpenHelper {
         if(!dbExist){
             //Con questo metodo un db vuoto sarà creato nel path di default del sistema
             //dell'app perciò posso sovrascrivere quel db con il mio.
-            this.getReadableDatabase();
+            this.getWritableDatabase();
 
             try {
                 copyDataBase();
@@ -74,7 +74,7 @@ class DataBaseHelper extends SQLiteOpenHelper {
 
         try{
             String myPath = DB_PATH + DB_NAME;
-            checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+            checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
         }
         catch(SQLiteException e){
             //db non esiste ancora.
@@ -119,7 +119,7 @@ class DataBaseHelper extends SQLiteOpenHelper {
     //Apre il db
     void openDataBase() throws SQLException {
         String myPath = DB_PATH + DB_NAME;
-        myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+        myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
     }
 
     /**
