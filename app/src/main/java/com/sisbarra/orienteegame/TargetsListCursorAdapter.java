@@ -112,7 +112,7 @@ class TargetsListCursorAdapter extends CursorAdapter {
         return res.intValue();
     }
 
-    public void setCurrentLocation(Location loc){
+    void setCurrentLocation(Location loc){
         //Verifico se ho già una location, se sì uso set e non new
         if(mCurrentPos == null)
             mCurrentPos = new Location(loc);

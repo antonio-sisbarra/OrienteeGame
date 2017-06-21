@@ -96,14 +96,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        //Verifica dell'username e se siamo al primo utilizzo del gioco -> Dialog
-        getUserInfo();
-
         super.onStart();
     }
 
     @Override
     protected void onPostResume() {
+        //Verifica dell'username e se siamo al primo utilizzo del gioco -> Dialog
+        getUserInfo();
+
         //Verifica della connessione a internet e gps
         verifyInternetGps();
 
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-        mMyLocation = new MyLocation(mLocationManager, mGpsEnabled, mNetworkEnabled, this);
+        mMyLocation = new MyLocation(mLocationManager, this);
         mMyLocation.getLocation(this, mLocationResult);
 
 

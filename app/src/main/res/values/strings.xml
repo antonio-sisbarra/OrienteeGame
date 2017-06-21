@@ -30,7 +30,7 @@
     <!-- Errori -->
     <string name="error_copy_db">Errore nel copiare il database</string>
     <string name="error_create_db">Errore nel creare il database</string>
-    <string name="gps_network_not_enabled">Rete e gps non attiva, almeno la rete deve essere attiva
+    <string name="gps_network_not_enabled">Localizzazione non attiva, deve essere attiva
     </string>
     <string name="connection_not_enabled">Connessione non attiva, deve essere attiva</string>
 
