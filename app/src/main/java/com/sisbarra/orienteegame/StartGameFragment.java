@@ -110,8 +110,6 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
         mLstTargets.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO: PRENDO OGGETTO COLLEGATO ALLA POSIZIONE
-                //TODO: FACCIO PARTIRE ACTIVITY DELLA BUSSOLA
                 startGamingActivity((Cursor) mAdapter.getItem(position));
             }
         });
@@ -126,9 +124,11 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
             public void run() {
                 double lat = curs.getDouble(curs.getColumnIndex(DataBaseHelper.LAT_COLUMN));
                 double lng = curs.getDouble(curs.getColumnIndex(DataBaseHelper.LONG_COLUMN));
+                String titleTarget = curs.getString(curs.getColumnIndex(DataBaseHelper.NAME_COLUMN));
                 Intent intent = new Intent(getContext(), GamingActivity.class);
                 intent.putExtra(getString(R.string.lat_intent_gaming), lat);
                 intent.putExtra(getString(R.string.long_intent_gaming), lng);
+                intent.putExtra(getString(R.string.titleTarget_name), titleTarget);
                 startActivity(intent);
             }
         }).start();

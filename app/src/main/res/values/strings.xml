@@ -52,4 +52,5 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="long_intent_gaming">long</string>
     <string name="lat_intent_gaming">lat</string>
+    <string name="titleTarget_name">titleTarget</string>
 </resources>

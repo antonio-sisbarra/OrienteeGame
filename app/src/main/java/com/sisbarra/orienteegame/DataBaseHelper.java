@@ -22,6 +22,7 @@ class DataBaseHelper extends SQLiteOpenHelper {
 
     static String LAT_COLUMN = "lat";
     static String LONG_COLUMN = "long";
+    static String NAME_COLUMN = "name";
     private static String ID_COLUMN = "_id";
 
     //The Android's default system path of my application database.
@@ -152,7 +153,7 @@ class DataBaseHelper extends SQLiteOpenHelper {
     Cursor getAllTargetCursor(){
 
         return myDataBase.query(true, myContext.getString(R.string.name_table_targets),
-                new String[]{ID_COLUMN, LAT_COLUMN, LONG_COLUMN}, null, null, null, null, null, null);
+                new String[]{ID_COLUMN, NAME_COLUMN, LAT_COLUMN, LONG_COLUMN}, null, null, null, null, null, null);
     }
 
     // TODO: Add your public helper methods to access and get content from the database.

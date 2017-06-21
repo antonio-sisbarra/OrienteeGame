@@ -1,6 +1,9 @@
 package com.sisbarra.orienteegame;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
@@ -10,6 +13,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -34,20 +39,6 @@ public class GamingActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -85,6 +76,31 @@ public class GamingActivity extends AppCompatActivity {
             hide();
         }
     };
+    /**
+     * Touch listener to use for in-layout UI controls to delay hiding the
+     * system UI. This is to prevent the jarring behavior of controls going away
+     * while interacting with activity UI.
+     */
+    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (AUTO_HIDE) {
+                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            }
+            return false;
+        }
+    };
+    //Oggetto partita
+    private Partita mPartita;
+
+    //LocationResult per il listener della posizione
+    private MyLocation.LocationResult mLocationResult;
+
+    //Oggetto MyLocation (astrazione della gestione location)
+    private  MyLocation mMyLocation;
+
+    //Riferimento al Location Manager
+    private LocationManager mLocationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,14 +136,43 @@ public class GamingActivity extends AppCompatActivity {
 
     //Inizializza la partita
     private void initializeMatch(){
-        double latTarget = getIntent().getExtras().getDouble(getString(R.string.lat_intent_gaming),
+        final double latTarget = getIntent().getExtras().getDouble(getString(R.string.lat_intent_gaming),
                 0);
-        double lngTarget = getIntent().getExtras().getDouble(getString(R.string.long_intent_gaming),
+        final double lngTarget = getIntent().getExtras().getDouble(getString(R.string.long_intent_gaming),
                 0);
+        final String titletarget = getIntent().getExtras().getString(getString(R.string.titleTarget_name),
+                "");
 
         //TODO: QUI INIZIALIZZO LA LOGICA DEL GIOCO
         ((TextView) findViewById(R.id.fullscreen_content)).setText("Il tuo obiettivo è "
             +latTarget+ " lat, e " +lngTarget+ " long");
+
+        //Prendo riferimento al LocationManager
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //Faccio partire il listener della posizione
+        mLocationResult = new MyLocation.LocationResult(){
+            @Override
+            public void gotLocation(Location location){
+                //Got the location!
+                if(location!=null) {
+                    final Location curLoc = location;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //TODO: GESTIONE DELL'AGGIORNAMENTO LOCATION
+                            ((TextView) findViewById(R.id.fullscreen_content)).setText("La tua pos è "
+                                    +curLoc.getLatitude()+ " lat, e " +curLoc.getLongitude()+ " long");
+                        }
+                    });
+                    //Se una partita ancora non è stata creata la creo
+                    if(mPartita==null) mPartita = new Partita(new LatLng(latTarget, lngTarget),
+                            new LatLng(curLoc.getLatitude(), curLoc.getLongitude()), titletarget);
+                }
+            }
+        };
+        mMyLocation = new MyLocation(mLocationManager, this);
+        mMyLocation.getLocation(this, mLocationResult);
     }
 
     @Override

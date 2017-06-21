@@ -2,6 +2,11 @@ package com.sisbarra.orienteegame;
 
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by Antonio Sisbarra on 21/06/2017.
  * Classe che incapsula tutto lo svolgimento di una partita fino alla sua conclusione.
@@ -10,17 +15,28 @@ import android.location.Location;
 class Partita {
 
     private static int MULTIPLICATOR_PRIZE = 5;
+    private static int SECONDS_FOR_LESSPRIZE = 10;
 
-    private Location mTarget;
-    private Location mActualLocation;
+    private LatLng mTarget;
+    private LatLng mActualLocation;
     private int mDistance;
     private int mPrize;
+    private String mTargetTitle;
+    private Timer mTimer; //Timer che diminuisce il punteggio
 
-    public Partita(Location target, Location actualLocation) {
-        mTarget = new Location(target);
-        mActualLocation = new Location(actualLocation);
-        mDistance = calculateDistance(actualLocation, target);
+    public Partita(LatLng target, LatLng actualLocation, String title) {
+        mTarget = target;
+        mActualLocation = actualLocation;
+        mDistance = calculateDistance(mActualLocation, mTarget);
         mPrize = mDistance * MULTIPLICATOR_PRIZE;
+        mTargetTitle = title;
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                decreasePrize(10);
+            }
+        }, SECONDS_FOR_LESSPRIZE * 1000);
     }
 
     //Il metodo finishMatch ritorna il prize
@@ -28,10 +44,14 @@ class Partita {
         return mPrize;
     }
 
+    private void decreasePrize(int decrease){
+        mPrize = mPrize - decrease;
+    }
+
     //Calcola la distanza in m tra due Location
-    private int calculateDistance(Location start, Location end){
-        double lat_a = start.getLatitude(), lat_b = end.getLatitude();
-        double lng_a = start.getLatitude(), lng_b = end.getLatitude();
+    private int calculateDistance(LatLng start, LatLng end){
+        double lat_a = start.latitude, lat_b = end.latitude;
+        double lng_a = start.longitude, lng_b = end.longitude;
 
         double earthRadius = 3958.75;
         double latDiff = Math.toRadians(lat_b-lat_a);
@@ -49,20 +69,22 @@ class Partita {
     }
 
     /** GETTER E SETTER PER I VARI CAMPI **/
-    public Location getTarget() {
+    public LatLng getTarget() {
         return mTarget;
     }
 
     public void setTarget(Location target) {
-        mTarget = target;
+        mTarget = new LatLng(target.getLatitude(),
+                target.getLongitude());
     }
 
-    public Location getActualLocation() {
+    public LatLng getActualLocation() {
         return mActualLocation;
     }
 
     public void setActualLocation(Location actualLocation) {
-        mActualLocation = actualLocation;
+        mActualLocation = new LatLng(
+                actualLocation.getLatitude(), actualLocation.getLongitude());
     }
 
     public int getDistance() {
@@ -75,5 +97,13 @@ class Partita {
 
     public void setPrize(int prize) {
         mPrize = prize;
+    }
+
+    public String getTargetTitle() {
+        return mTargetTitle;
+    }
+
+    public void setTargetTitle(String targetTitle) {
+        mTargetTitle = targetTitle;
     }
 }

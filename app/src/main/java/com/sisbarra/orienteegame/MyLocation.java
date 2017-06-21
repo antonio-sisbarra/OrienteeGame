@@ -73,7 +73,7 @@ class MyLocation {
                     locationListenerNetwork);
 
         timer1 = new Timer();
-        timer1.schedule(new GetLastLocation(), 20000);
+        timer1.schedule(new GetLastLocation(), 7000);
         return true;
     }
 
