@@ -1,0 +1,24 @@
+[
+    {
+        "points":[
+            {
+                "latitude":43.710298,"longitude":10.396483
+            },
+            {
+                "latitude":43.710166,"longitude":10.397475
+            },
+            {
+                "latitude":43.710292,"longitude":10.397706
+            },
+            {
+                "latitude":43.710775,"longitude":10.397714
+            }
+        ],
+         "nameTarget":"Piazza Emanuele",
+         "target":{
+             "latitude":43.710831,
+             "longitude":10.397827
+        },
+         "namePlayer":"mario.rossi"
+    }
+]

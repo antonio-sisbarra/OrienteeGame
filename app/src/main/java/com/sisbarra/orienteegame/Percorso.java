@@ -1,20 +1,34 @@
 package com.sisbarra.orienteegame;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
 /**
  * Created by Antonio Sisbarra on 23/06/2017.
- * Classe che incapsula la lista di
+ * Classe che incapsula la lista di Punti del cammino verso il target e altre info.
  */
 
 public class Percorso {
 
+    @SerializedName("points")
     private ArrayList<LatLng> mLatLngs;
 
-    public Percorso(){
+    @SerializedName("target")
+    private LatLng mTarget;
+
+    @SerializedName("nameTarget")
+    private String mNameTarget;
+
+    @SerializedName("namePlayer")
+    private String mNamePlayer;
+
+    public Percorso(String nameTarget, LatLng targ, String player){
         mLatLngs = new ArrayList<LatLng>();
+        mNameTarget = nameTarget;
+        mTarget = targ;
+        mNamePlayer = player;
     }
 
     //Aggiunge il punto alla lista
@@ -30,4 +44,15 @@ public class Percorso {
         return new ArrayList<LatLng>(mLatLngs);
     }
 
+    public LatLng getTarget() {
+        return mTarget;
+    }
+
+    public String getNameTarget() {
+        return mNameTarget;
+    }
+
+    public String getNamePlayer() {
+        return mNamePlayer;
+    }
 }
