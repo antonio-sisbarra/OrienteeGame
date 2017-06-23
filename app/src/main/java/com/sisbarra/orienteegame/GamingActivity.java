@@ -2,10 +2,9 @@ package com.sisbarra.orienteegame;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -28,11 +27,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
-
 import static com.sisbarra.orienteegame.R.style.AppAlertTheme;
 
 /**
@@ -44,8 +38,8 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     public static final String FIXED = "FIXED";
     //Costante per filtro bassa banda
     static final float ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
-    //Costante per il range del proximity alert
-    static final int RANGE = 7; //7 METRI
+    //Costante per il range per la fine della partita
+    static final int RANGE = 7;
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -72,20 +66,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             }
         }
     };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -109,6 +89,20 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         @Override
         public void run() {
             hide();
+        }
+    };
+    /**
+     * Touch listener to use for in-layout UI controls to delay hiding the
+     * system UI. This is to prevent the jarring behavior of controls going away
+     * while interacting with activity UI.
+     */
+    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (AUTO_HIDE) {
+                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            }
+            return false;
         }
     };
     //Oggetto partita
@@ -146,8 +140,12 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     private GeomagneticField geomagneticField;
     private double bearing = 0;
     private CompassView mCompassView;
-    //Broadcast receiver per obiettivo raggiunto
-    private BroadcastReceiver mBroadcastReceiver;
+
+    //Riferimento al DB
+    private DataBaseHelper mHelper;
+
+    //Titolo del Target
+    private String mTitleTarget;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,6 +168,12 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             }
         });
 
+        //Riferimento al DB
+        try {
+            mHelper = new DataBaseHelper(this);
+        } catch (PackageManager.NameNotFoundException e) {
+            finish();
+        }
 
         //Riferimenti al layout
         getLayoutReferences();
@@ -242,30 +246,33 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
 
         mLatTarget = latTarget;
         mLongTarget = lngTarget;
+        mTitleTarget = titletarget;
 
         //Calcolo distanza tra due punti
         mDistance = distance(lastLat, lastLong, latTarget, lngTarget);
 
         //Setto i valori per le textView
-        mTextLat.setText(MessageFormat.format("Lat. {0}", lastLat));
-        mTextLong.setText(MessageFormat.format("Long. {0}", lastLong));
+        mTextLat.setText(String.format("Lat. %s", lastLat));
+        mTextLong.setText(String.format("Long. %s", lastLong));
         mTextDistance.setText("Sei distante "+mDistance+" m dall'obiettivo!");
 
         //Inizializzo la logica del gioco
         mPartita = new Partita(new LatLng(latTarget, lngTarget),
                 new LatLng(lastLat, lastLong), titletarget, mDistance);
 
+        //VERIFICA DELLA DISTANZA IN RELAZIONE AL RANGE
+        if(mDistance <= RANGE){
+            int points = mPartita.finishMatch();
+            //TODO: AGGIUNGO POSIZIONE ATTUALE ALLA LISTA DEI PUNTI
+            //TODO: SALVO NELLA LISTA CONDIVISA IL PERCORSO
+            //TODO: AGGIUNGO I PUNTI ALLA PREFERENCE DEDICATA
+            //TODO: RIMUOVO DAL DB IL TARGET APPENA RAGGIUNTO (NOME)
+            //TODO: MOSTRO UN TOAST CON OBIETTIVO RAGGIUNTO
+            //TODO: TORNO ALLA MAINACTIVITY
+        }
+
         //Prendo riferimento al LocationManager
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        //Creo il receiver per il proximity alert
-        mBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                //TODO: FINE DELLA PARTITA
-                int i = 5 + 1;
-            }
-        };
 
         //Faccio partire il listener della posizione
         mLocationResult = new MyLocation.LocationResult(){
@@ -275,6 +282,20 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                 if(location!=null) {
                     //Aggiornamento Location
                     mCurrentLocation = location;
+
+                    //TODO: FINE PARTITA SE DIST <= RANGE
+                    //VERIFICA DELLA DISTANZA IN RELAZIONE AL RANGE
+                    if(mDistance <= RANGE){
+                        //TODO: AGGIUNGO POSIZIONE ATTUALE ALLA LISTA DEI PUNTI
+                        //TODO: SALVO NELLA LISTA CONDIVISA IL PERCORSO
+                        //TODO: AGGIUNGO I PUNTI ALLA PREFERENCE DEDICATA
+                        //TODO: RIMUOVO DAL DB IL TARGET APPENA RAGGIUNTO (NOME)
+                        //TODO: MOSTRO UN TOAST CON OBIETTIVO RAGGIUNTO
+                        //TODO: TORNO ALLA MAINACTIVITY
+                    }
+
+                    //TODO: MI TENGO IN MEMORIA IL PERCORSO
+
                     // used to update location info on screen
                     runOnUiThread(new Runnable() {
                         @Override
@@ -290,7 +311,7 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                 }
             }
         };
-        mMyLocation = new MyLocation(mLocationManager, this, RANGE);
+        mMyLocation = new MyLocation(mLocationManager, this);
         mMyLocation.getLocationForCompass(this, mLocationResult, latTarget, lngTarget);
     }
 
@@ -300,11 +321,8 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             mTextLong.setText(NA);
         }
 
-        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
-        dfs.setDecimalSeparator('.');
-        NumberFormat formatter = new DecimalFormat("#0.00", dfs);
-        mTextLat.setText(MessageFormat.format("Lat. {0}", formatter.format(loc.getLatitude())));
-        mTextLong.setText(MessageFormat.format("Long. {0}", formatter.format(loc.getLongitude())));
+        mTextLat.setText(String.format("Lat. %s", loc.getLatitude()));
+        mTextLong.setText(String.format("Long. %s", loc.getLongitude()));
         mDistance = distance(loc.getLatitude(), loc.getLongitude(), mLatTarget, mLongTarget);
         mTextDistance.setText("Sei distante "+mDistance+" m dall'obiettivo!");
     }

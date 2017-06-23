@@ -25,6 +25,8 @@ class DataBaseHelper extends SQLiteOpenHelper {
     static String NAME_COLUMN = "name";
     private static String ID_COLUMN = "_id";
 
+    private static String DATABASE_TABLE = "Targets";
+
     //The Android's default system path of my application database.
     private static String DB_PATH;
     private static String DB_NAME = "orienteegame_database.sqlite";
@@ -148,6 +150,11 @@ class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+    }
+
+    //Cancella un target dal DB
+    void deleteTarget(String name){
+        myDataBase.delete(DATABASE_TABLE, NAME_COLUMN + "=" + name, null);
     }
 
     Cursor getAllTargetCursor(){
