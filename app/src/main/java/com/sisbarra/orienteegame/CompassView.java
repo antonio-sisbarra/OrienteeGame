@@ -1,5 +1,6 @@
 package com.sisbarra.orienteegame;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -49,6 +50,7 @@ class CompassView extends View {
      *
      * @param canvas the canvas on which the background will be drawn
      */
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         int bitmapWidth = bitmap.getWidth();

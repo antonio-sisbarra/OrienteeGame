@@ -2,7 +2,9 @@ package com.sisbarra.orienteegame;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -23,30 +25,56 @@ class MyLocation {
     private LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
+
+    //Range per proximity alert
+    private int mRange;
+
+    //PendingIntent per proxAlert
+    private PendingIntent mPi;
+
     //I listener
     private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
             timer1.cancel();
             locationResult.gotLocation(location);
         }
-        public void onProviderDisabled(String provider) {}
-        public void onProviderEnabled(String provider) {}
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+        public void onProviderDisabled(String provider) {
+        }
+
+        public void onProviderEnabled(String provider) {
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
     };
     private LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
             timer1.cancel();
             locationResult.gotLocation(location);
         }
-        public void onProviderDisabled(String provider) {}
-        public void onProviderEnabled(String provider) {}
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+        public void onProviderDisabled(String provider) {
+        }
+
+        public void onProviderEnabled(String provider) {
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
     };
     private Activity mActivity;
 
     MyLocation(LocationManager lm, Activity activ) {
         mLocationManager = lm;
         mActivity = activ;
+    }
+
+    //Costruttore per proximity alert
+    MyLocation(LocationManager lm, Activity activ, int range) {
+        mLocationManager = lm;
+        mActivity = activ;
+        mRange = range;
     }
 
     boolean getLocation(Context context, LocationResult result) {
@@ -67,14 +95,37 @@ class MyLocation {
 
 
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0,
-                    locationListenerGps);
+                locationListenerGps);
 
         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 8000, 0,
-                    locationListenerNetwork);
+                locationListenerNetwork);
 
         timer1 = new Timer();
         timer1.schedule(new GetLastLocation(), 7000);
         return true;
+    }
+
+    boolean getLocationForCompass(Context context, LocationResult result, double latTarg,
+                                  double longTarg) {
+        registerProxAlert(latTarg, longTarg);
+
+        getLocation(context, result);
+
+        return true;
+    }
+
+    //Questo metodo registra un proximity alert
+    private void registerProxAlert(double lat, double lng) {
+        Intent i = new Intent("com.sisbarra.orienteegame");
+        mPi = PendingIntent.getBroadcast(mActivity, -1, i, 0);
+        if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(mActivity,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mLocationManager.addProximityAlert(lat, lng, mRange, -1, mPi);
     }
 
     //Con questo metodo setto anche un fattore di cambio posizione nel location updates
@@ -109,11 +160,13 @@ class MyLocation {
         return true;
     }
 
-    //Rimuove i listener dall'ascolto degli aggiornamenti
+    //Rimuove i listener dall'ascolto degli aggiornamenti e il proxalert se esiste
     void removeUpdates(){
         if(mLocationManager!=null) {
             mLocationManager.removeUpdates(locationListenerGps);
             mLocationManager.removeUpdates(locationListenerNetwork);
+            if(mPi!=null)
+                mLocationManager.removeProximityAlert(mPi);
         }
     }
 

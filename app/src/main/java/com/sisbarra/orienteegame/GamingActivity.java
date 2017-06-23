@@ -1,44 +1,91 @@
 package com.sisbarra.orienteegame;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.hardware.GeomagneticField;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+
+import static com.sisbarra.orienteegame.R.style.AppAlertTheme;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class GamingActivity extends AppCompatActivity {
+public class GamingActivity  extends AppCompatActivity implements SensorEventListener {
+    public static final String NA = "N/A";
+    public static final String FIXED = "FIXED";
+    //Costante per filtro bassa banda
+    static final float ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
+    //Costante per il range del proximity alert
+    static final int RANGE = 7; //7 METRI
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
      */
     private static final boolean AUTO_HIDE = true;
-
     /**
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
      */
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
-
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
+    private final Runnable mShowPart2Runnable = new Runnable() {
+        @Override
+        public void run() {
+            // Delayed display of UI elements
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.show();
+            }
+        }
+    };
+    /**
+     * Touch listener to use for in-layout UI controls to delay hiding the
+     * system UI. This is to prevent the jarring behavior of controls going away
+     * while interacting with activity UI.
+     */
+    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (AUTO_HIDE) {
+                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            }
+            return false;
+        }
+    };
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -57,18 +104,6 @@ public class GamingActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
-    private View mControlsView;
-    private final Runnable mShowPart2Runnable = new Runnable() {
-        @Override
-        public void run() {
-            // Delayed display of UI elements
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.show();
-            }
-            mControlsView.setVisibility(View.VISIBLE);
-        }
-    };
     private boolean mVisible;
     private final Runnable mHideRunnable = new Runnable() {
         @Override
@@ -76,31 +111,43 @@ public class GamingActivity extends AppCompatActivity {
             hide();
         }
     };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
     //Oggetto partita
     private Partita mPartita;
-
     //LocationResult per il listener della posizione
     private MyLocation.LocationResult mLocationResult;
-
     //Oggetto MyLocation (astrazione della gestione location)
     private  MyLocation mMyLocation;
-
     //Riferimento al Location Manager
     private LocationManager mLocationManager;
+    //Riferimento al Sensor Manager
+    private SensorManager mSensorManager;
+    //TextView del layout
+    private TextView mTextDistance, mTextLat, mTextLong;
+    //Sensore magnetico e di gravità
+    private Sensor mSensorMagnetic, mSensorGravity;
+    //Location
+    private Location mCurrentLocation;
+    //Coordinate del target
+    private double mLatTarget;
+    private double mLongTarget;
+    //Distanza e direzione obiettivo
+    private int mDistance;
+    private String mDirection;
+    // Gravity for accelerometer data
+    private float[] gravity = new float[3];
+    // magnetic data
+    private float[] geomagnetic = new float[3];
+    // Rotation data
+    private float[] rotation = new float[9];
+    // orientation (azimuth, pitch, roll)
+    private float[] orientation = new float[3];
+    // smoothed values
+    private float[] smoothed = new float[3];
+    private GeomagneticField geomagneticField;
+    private double bearing = 0;
+    private CompassView mCompassView;
+    //Broadcast receiver per obiettivo raggiunto
+    private BroadcastReceiver mBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,9 +160,7 @@ public class GamingActivity extends AppCompatActivity {
         }
 
         mVisible = true;
-        mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.fullscreen_content);
-
+        mContentView = findViewById(R.id.content_view);
 
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
@@ -125,13 +170,59 @@ public class GamingActivity extends AppCompatActivity {
             }
         });
 
-        // Upon interacting with UI controls, delay any scheduled hide()
-        // operations to prevent the jarring behavior of controls going away
-        // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
-        //Inizializzo la partita
+        //Riferimenti al layout
+        getLayoutReferences();
+
+        //WakeLock per il gaming
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        initializeSensors();
+
         initializeMatch();
+    }
+
+    //Inizializza i sensori
+    private void initializeSensors(){
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensorGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorMagnetic = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        // listen to these sensors
+        mSensorManager.registerListener(this, mSensorGravity,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mSensorMagnetic,
+                SensorManager.SENSOR_DELAY_FASTEST);
+    }
+
+    //Prende i riferimenti al layout
+    private void getLayoutReferences(){
+        mTextDistance = (TextView) findViewById(R.id.text_distance_gaming);
+        mTextLat = (TextView) findViewById(R.id.latitude);
+        mTextLong = (TextView) findViewById(R.id.longitude);
+        mCompassView = (CompassView) findViewById(R.id.compass);
+    }
+
+    //Formula di Haversine per la distanza tra due punti
+    private int distance (double lat_a, double lng_a, double lat_b, double lng_b ){
+        double earthRadius = 3958.75;
+        double latDiff = Math.toRadians(lat_b-lat_a);
+        double lngDiff = Math.toRadians(lng_b-lng_a);
+        double a = Math.sin(latDiff /2) * Math.sin(latDiff /2) +
+                Math.cos(Math.toRadians(lat_a)) * Math.cos(Math.toRadians(lat_b)) *
+                        Math.sin(lngDiff /2) * Math.sin(lngDiff /2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double distance = earthRadius * c;
+
+        int meterConversion = 1609;
+
+        Double res = distance * meterConversion;
+        return res.intValue();
     }
 
     //Inizializza la partita
@@ -143,12 +234,38 @@ public class GamingActivity extends AppCompatActivity {
         final String titletarget = getIntent().getExtras().getString(getString(R.string.titleTarget_name),
                 "");
 
-        //TODO: QUI INIZIALIZZO LA LOGICA DEL GIOCO
-        ((TextView) findViewById(R.id.fullscreen_content)).setText("Il tuo obiettivo è "
-            +latTarget+ " lat, e " +lngTarget+ " long");
+        //Prendo le coordinate dell'ultima location avuta
+        final double lastLat = getIntent().getExtras().getDouble(getString(R.string.lastLat),
+                0);
+        final double lastLong = getIntent().getExtras().getDouble(getString(R.string.lastLong),
+                0);
+
+        mLatTarget = latTarget;
+        mLongTarget = lngTarget;
+
+        //Calcolo distanza tra due punti
+        mDistance = distance(lastLat, lastLong, latTarget, lngTarget);
+
+        //Setto i valori per le textView
+        mTextLat.setText(MessageFormat.format("Lat. {0}", lastLat));
+        mTextLong.setText(MessageFormat.format("Long. {0}", lastLong));
+        mTextDistance.setText("Sei distante "+mDistance+" m dall'obiettivo!");
+
+        //Inizializzo la logica del gioco
+        mPartita = new Partita(new LatLng(latTarget, lngTarget),
+                new LatLng(lastLat, lastLong), titletarget, mDistance);
 
         //Prendo riferimento al LocationManager
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        //Creo il receiver per il proximity alert
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //TODO: FINE DELLA PARTITA
+                int i = 5 + 1;
+            }
+        };
 
         //Faccio partire il listener della posizione
         mLocationResult = new MyLocation.LocationResult(){
@@ -156,23 +273,83 @@ public class GamingActivity extends AppCompatActivity {
             public void gotLocation(Location location){
                 //Got the location!
                 if(location!=null) {
-                    final Location curLoc = location;
+                    //Aggiornamento Location
+                    mCurrentLocation = location;
+                    // used to update location info on screen
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            //TODO: GESTIONE DELL'AGGIORNAMENTO LOCATION
-                            ((TextView) findViewById(R.id.fullscreen_content)).setText("La tua pos è "
-                                    +curLoc.getLatitude()+ " lat, e " +curLoc.getLongitude()+ " long");
+                            updateLocation(mCurrentLocation);
                         }
                     });
-                    //Se una partita ancora non è stata creata la creo
-                    if(mPartita==null) mPartita = new Partita(new LatLng(latTarget, lngTarget),
-                            new LatLng(curLoc.getLatitude(), curLoc.getLongitude()), titletarget);
+                    geomagneticField = new GeomagneticField(
+                            (float) mCurrentLocation.getLatitude(),
+                            (float) mCurrentLocation.getLongitude(),
+                            (float) mCurrentLocation.getAltitude(),
+                            System.currentTimeMillis());
                 }
             }
         };
-        mMyLocation = new MyLocation(mLocationManager, this);
-        mMyLocation.getLocation(this, mLocationResult);
+        mMyLocation = new MyLocation(mLocationManager, this, RANGE);
+        mMyLocation.getLocationForCompass(this, mLocationResult, latTarget, lngTarget);
+    }
+
+    private void updateLocation(Location loc){
+        if (FIXED.equals(loc.getProvider())) {
+            mTextLat.setText(NA);
+            mTextLong.setText(NA);
+        }
+
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        NumberFormat formatter = new DecimalFormat("#0.00", dfs);
+        mTextLat.setText(MessageFormat.format("Lat. {0}", formatter.format(loc.getLatitude())));
+        mTextLong.setText(MessageFormat.format("Long. {0}", formatter.format(loc.getLongitude())));
+        mDistance = distance(loc.getLatitude(), loc.getLongitude(), mLatTarget, mLongTarget);
+        mTextDistance.setText("Sei distante "+mDistance+" m dall'obiettivo!");
+    }
+
+    //Metodo per filtrare i dati dei sensori
+    protected float[] lowPass( float[] input, float[] output ) {
+        if ( output == null ) return input;
+        for ( int i=0; i<input.length; i++ ) {
+            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+        }
+        return output;
+    }
+
+    //Crea il dialog builder per l'uscita dal gioco
+    private void createExitDialogBuilder(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this, AppAlertTheme);
+
+        final Activity activ = this;
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage(R.string.abbandono_partita)
+                .setCancelable(false)
+                .setPositiveButton("Sì",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        // This ID represents the Home or Up button.
+                        NavUtils.navigateUpFromSameTask(activ);
+                    }
+                })
+                .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
     }
 
     @Override
@@ -186,14 +363,32 @@ public class GamingActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        // remove listeners
+        mSensorManager.unregisterListener(this, mSensorGravity);
+        mSensorManager.unregisterListener(this, mSensorMagnetic);
+        mMyLocation.removeUpdates();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            // This ID represents the Home or Up button.
-            NavUtils.navigateUpFromSameTask(this);
+
+            createExitDialogBuilder();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Take care of popping the fragment back stack or finishing the activity
+     * as appropriate.
+     */
+    @Override
+    public void onBackPressed() {
+        createExitDialogBuilder();
     }
 
     private void toggle() {
@@ -210,7 +405,6 @@ public class GamingActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-        mControlsView.setVisibility(View.GONE);
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay
@@ -237,5 +431,83 @@ public class GamingActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    /**
+     * Called when there is a new sensor event.  Note that "on changed"
+     * is somewhat of a misnomer, as this will also be called if we have a
+     * new reading from a sensor with the exact same sensor values (but a
+     * newer timestamp).
+     * <p>
+     * <p>See {@link SensorManager SensorManager}
+     * for details on possible sensor types.
+     * <p>See also {@link SensorEvent SensorEvent}.
+     * <p>
+     * <p><b>NOTE:</b> The application doesn't own the
+     * {@link SensorEvent event}
+     * object passed as a parameter and therefore cannot hold on to it.
+     * The object may be part of an internal pool and may be reused by
+     * the framework.
+     *
+     * @param event the {@link SensorEvent SensorEvent}.
+     */
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        boolean accelOrMagnetic = false;
+
+        // get accelerometer data
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            // we need to use a low pass filter to make data smoothed
+            smoothed = lowPass(event.values.clone(), gravity);
+            gravity[0] = smoothed[0];
+            gravity[1] = smoothed[1];
+            gravity[2] = smoothed[2];
+            accelOrMagnetic = true;
+
+        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            smoothed = lowPass(event.values.clone(), geomagnetic);
+            geomagnetic[0] = smoothed[0];
+            geomagnetic[1] = smoothed[1];
+            geomagnetic[2] = smoothed[2];
+            accelOrMagnetic = true;
+
+        }
+
+        // get rotation matrix to get gravity and magnetic data
+        SensorManager.getRotationMatrix(rotation, null, gravity, geomagnetic);
+        // get bearing to target
+        SensorManager.getOrientation(rotation, orientation);
+        // east degrees of true North
+        bearing = orientation[0];
+        // convert from radians to degrees
+        bearing = Math.toDegrees(bearing);
+
+        // fix difference between true North and magnetical North
+        if (geomagneticField != null) {
+            bearing += geomagneticField.getDeclination();
+        }
+
+        // bearing must be in 0-360
+        if (bearing < 0) {
+            bearing += 360;
+        }
+
+        // update compass view
+        mCompassView.setBearing((float) bearing);
+
+        if (accelOrMagnetic) {
+            mCompassView.postInvalidate();
+        }
+    }
+
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD
+                && accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
+            // manage fact that compass data are unreliable ...
+            //Toast per avvisare l'utente
+            Toast.makeText(this, R.string.accuracy_unreliable, Toast.LENGTH_SHORT).show();
+        }
     }
 }

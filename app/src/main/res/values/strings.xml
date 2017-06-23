@@ -18,6 +18,10 @@
     <string name="easy_target_text">Obiettivo facile</string>
     <string name="medium_target_text">Obiettivo medio</string>
     <string name="hard_target_text">Obiettivo difficile</string>
+    <string name="otherpaths_text">Percorsi degli altri giocatori:</string>
+    <string name="historypaths_text">I tuoi percorsi:</string>
+    <string name="accuracy_unreliable">Accuratezza dei sensori molto bassa</string>
+    <string name="abbandono_partita">Vuoi davvero abbandonare la partita?</string>
 
     <!-- Nomi delle preferences -->
     <string name="first_time_pref">firstTime</string>
@@ -53,4 +57,6 @@
     <string name="long_intent_gaming">long</string>
     <string name="lat_intent_gaming">lat</string>
     <string name="titleTarget_name">titleTarget</string>
+    <string name="lastLat">lastLat</string>
+    <string name="lastLong">lastLong</string>
 </resources>

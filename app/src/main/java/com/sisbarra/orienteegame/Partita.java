@@ -23,11 +23,12 @@ class Partita {
     private int mPrize;
     private String mTargetTitle;
     private Timer mTimer; //Timer che diminuisce il punteggio
+    private boolean mFinished = false; //Flag per capire se è finita la partita
 
-    public Partita(LatLng target, LatLng actualLocation, String title) {
+    public Partita(LatLng target, LatLng actualLocation, String title, int dist) {
         mTarget = target;
         mActualLocation = actualLocation;
-        mDistance = calculateDistance(mActualLocation, mTarget);
+        mDistance = dist;
         mPrize = mDistance * MULTIPLICATOR_PRIZE;
         mTargetTitle = title;
         mTimer = new Timer();
@@ -41,31 +42,15 @@ class Partita {
 
     //Il metodo finishMatch ritorna il prize
     int finishMatch(){
+        mFinished = true;
+        mTimer.cancel();
         return mPrize;
     }
 
     private void decreasePrize(int decrease){
+        if(mPrize == 0) return;
         mPrize = mPrize - decrease;
-    }
-
-    //Calcola la distanza in m tra due Location
-    private int calculateDistance(LatLng start, LatLng end){
-        double lat_a = start.latitude, lat_b = end.latitude;
-        double lng_a = start.longitude, lng_b = end.longitude;
-
-        double earthRadius = 3958.75;
-        double latDiff = Math.toRadians(lat_b-lat_a);
-        double lngDiff = Math.toRadians(lng_b-lng_a);
-        double a = Math.sin(latDiff /2) * Math.sin(latDiff /2) +
-                Math.cos(Math.toRadians(lat_a)) * Math.cos(Math.toRadians(lat_b)) *
-                        Math.sin(lngDiff /2) * Math.sin(lngDiff /2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        double distance = earthRadius * c;
-
-        int meterConversion = 1609;
-
-        Double res = distance * meterConversion;
-        return res.intValue();
+        if(mPrize<0) mPrize = 0;
     }
 
     /** GETTER E SETTER PER I VARI CAMPI **/
@@ -76,6 +61,10 @@ class Partita {
     public void setTarget(Location target) {
         mTarget = new LatLng(target.getLatitude(),
                 target.getLongitude());
+    }
+
+    boolean isFinished(){
+        return mFinished;
     }
 
     public LatLng getActualLocation() {
