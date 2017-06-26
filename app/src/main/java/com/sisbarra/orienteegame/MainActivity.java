@@ -396,9 +396,8 @@ public class MainActivity extends AppCompatActivity {
             //Faccio uno switch sulla position (0 game, 1 others, 2 history
             switch (position){
                 case 0: return StartGameFragment.newInstance();
-                //TODO: DA COMPLETARE
-                case 1: return OthersFragment.newInstance("pippo", "cacca");
-                case 2: return HistoryFragment.newInstance("Ue");
+                case 1: return OthersFragment.newInstance();
+                case 2: return HistoryFragment.newInstance();
                 default: return StartGameFragment.newInstance();
             }
         }

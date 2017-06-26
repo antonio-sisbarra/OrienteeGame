@@ -44,7 +44,7 @@
 
             <!-- Progress bar per il caricamento dei path -->
             <RelativeLayout
-                android:id="@+id/loadingTargetPanel"
+                android:id="@+id/loadingPathPanel"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center" >

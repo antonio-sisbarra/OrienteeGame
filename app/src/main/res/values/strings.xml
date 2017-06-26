@@ -22,6 +22,8 @@
     <string name="historypaths_text">I tuoi percorsi:</string>
     <string name="accuracy_unreliable">Accuratezza dei sensori molto bassa</string>
     <string name="abbandono_partita">Vuoi davvero abbandonare la partita?</string>
+    <string name="otherpaths_filename">OtherPaths.json</string>
+    <string name="mypaths_filename">MyPaths.json</string>
 
     <!-- Nomi delle preferences -->
     <string name="first_time_pref">firstTime</string>

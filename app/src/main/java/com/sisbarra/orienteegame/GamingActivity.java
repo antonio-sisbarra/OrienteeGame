@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
@@ -66,6 +67,20 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             }
         }
     };
+    /**
+     * Touch listener to use for in-layout UI controls to delay hiding the
+     * system UI. This is to prevent the jarring behavior of controls going away
+     * while interacting with activity UI.
+     */
+    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (AUTO_HIDE) {
+                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            }
+            return false;
+        }
+    };
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -89,20 +104,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         @Override
         public void run() {
             hide();
-        }
-    };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
         }
     };
     //Oggetto partita
@@ -146,6 +147,9 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
 
     //Titolo del Target
     private String mTitleTarget;
+
+    //Nome delle Pref
+    private String PREFERENCE_FILENAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -255,6 +259,11 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         mTextLat.setText(String.format("Lat. %s", lastLat));
         mTextLong.setText(String.format("Long. %s", lastLong));
         mTextDistance.setText("Sei distante "+mDistance+" m dall'obiettivo!");
+
+        //Prendo l'username dalle Pref
+        PREFERENCE_FILENAME = getString(R.string.filename_pref);
+        SharedPreferences gameSettings = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        String user = gameSettings.getString(getString(R.string.username_pref), "");
 
         //Inizializzo la logica del gioco
         mPartita = new Partita(new LatLng(latTarget, lngTarget),
