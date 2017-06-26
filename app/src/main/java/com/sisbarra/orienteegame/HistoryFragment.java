@@ -17,6 +17,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
+import static com.sisbarra.orienteegame.R.string.mypaths_filename;
 
 
 /**
@@ -75,12 +77,12 @@ public class HistoryFragment extends Fragment {
     //Carica dallo storage interno il file Json con i miei percorsi personali
     private void loadData() {
         try {
-            InputStream ims = getActivity().openFileInput(getString(R.string.mypaths_filename));
+            InputStream ims = getActivity().openFileInput(getString(mypaths_filename));
 
             Gson gson = new Gson();
             Reader reader = new InputStreamReader(ims);
 
-            percorsi = gson.fromJson(reader, new TypeToken<ArrayList<Percorso>>() {
+            percorsi = gson.fromJson(reader, new TypeToken<List<Percorso>>() {
             }.getType());
 
             ims.close();
@@ -90,10 +92,12 @@ public class HistoryFragment extends Fragment {
             Gson gson = new Gson();
             percorsi = new ArrayList<Percorso>();
             try {
-                OutputStream fos = getActivity().openFileOutput(getString(R.string.mypaths_filename)
+                FileOutputStream fos = getActivity().openFileOutput(getString(mypaths_filename)
                         , Context.MODE_PRIVATE);
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
-                writer.write(gson.toJson(percorsi));
+                Type listOfPercorsi = new TypeToken<List<Percorso>>(){}.getType();
+                writer.write(gson.toJson(percorsi, listOfPercorsi));
+                writer.flush();
                 fos.close();
             } catch (Exception e1) {
                 Log.e(TAG, e1.toString());
@@ -110,10 +114,11 @@ public class HistoryFragment extends Fragment {
         Type listOfPercorsi = new TypeToken<List<Percorso>>(){}.getType();
         Gson gson = new Gson();
         try {
-            OutputStream fos = getActivity().openFileOutput(getString(R.string.mypaths_filename)
+            OutputStream fos = getActivity().openFileOutput(getString(mypaths_filename)
                     , Context.MODE_PRIVATE);
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
             writer.write(gson.toJson(percorsi, listOfPercorsi));
+            writer.flush();
             fos.close();
         } catch (Exception e1) {
             Log.e(TAG, e1.toString());
@@ -155,7 +160,7 @@ public class HistoryFragment extends Fragment {
             // Attach the adapter to a ListView
             mPaths = (ListView) getActivity().findViewById(R.id.historyPaths_listview);
             mPaths.setAdapter(adapter);
-            getActivity().findViewById(R.id.loadingPathPanel).setVisibility(View.GONE);
+            getActivity().findViewById(R.id.loadingMyPathPanel).setVisibility(View.GONE);
         }
     }
 }
