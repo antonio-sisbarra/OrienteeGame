@@ -11,6 +11,7 @@
       <w>inputstream</w>
       <w>listview</w>
       <w>lngs</w>
+      <w>mainactivity</w>
       <w>mindistance</w>
       <w>nrow</w>
       <w>orienteegame</w>
@@ -25,6 +26,7 @@
       <w>splashscreen</w>
       <w>targ</w>
       <w>titletarget</w>
+      <w>verrà</w>
     </words>
   </dictionary>
 </component>

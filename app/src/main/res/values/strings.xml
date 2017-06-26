@@ -61,4 +61,6 @@
     <string name="titleTarget_name">titleTarget</string>
     <string name="lastLat">lastLat</string>
     <string name="lastLong">lastLong</string>
+    <string name="percorso_intent_name">Percorso</string>
+    <string name="obiettivo_raggiunto_toast">Obiettivo raggiunto! :)</string>
 </resources>

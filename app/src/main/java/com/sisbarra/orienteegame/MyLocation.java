@@ -90,13 +90,6 @@ class MyLocation {
         return true;
     }
 
-    boolean getLocationForCompass(Context context, LocationResult result, double latTarg,
-                                  double longTarg) {
-        getLocation(context, result);
-
-        return true;
-    }
-
     //Con questo metodo setto anche un fattore di cambio posizione nel location updates
     boolean setDistanceForUpdates(Context context, LocationResult result, int minDistance){
         //Uso la callback di location result per passare la posizione attuale all'utente
@@ -118,10 +111,10 @@ class MyLocation {
 
         }
 
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 9000, minDistance,
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, minDistance,
                     locationListenerGps);
 
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 14000, minDistance,
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, minDistance,
                     locationListenerNetwork);
 
         timer1 = new Timer();

@@ -27,12 +27,11 @@ public class Percorso {
     @SerializedName("prize")
     private int mPrize;
 
-    public Percorso(String nameTarget, LatLng targ, String player, int prize){
+    public Percorso(String nameTarget, LatLng targ, String player){
         mLatLngs = new ArrayList<LatLng>();
         mNameTarget = nameTarget;
         mTarget = targ;
         mNamePlayer = player;
-        mPrize = prize;
     }
 
     //Aggiunge il punto alla lista
@@ -62,5 +61,9 @@ public class Percorso {
 
     public int getPrize() {
         return mPrize;
+    }
+
+    public void setPrize(int prize) {
+        mPrize = prize;
     }
 }

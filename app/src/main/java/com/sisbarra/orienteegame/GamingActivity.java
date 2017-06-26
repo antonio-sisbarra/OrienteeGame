@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.GeomagneticField;
@@ -15,7 +16,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 
+import static com.sisbarra.orienteegame.R.string.points_pref;
 import static com.sisbarra.orienteegame.R.style.AppAlertTheme;
 
 /**
@@ -56,6 +58,8 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
+    //MinDistance per aggiornamenti posizione (in metri)
+    private static final int MINDISTANCE_UPDATES = 5;
     private final Handler mHideHandler = new Handler();
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
@@ -65,20 +69,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             if (actionBar != null) {
                 actionBar.show();
             }
-        }
-    };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
         }
     };
     private View mContentView;
@@ -104,6 +94,20 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         @Override
         public void run() {
             hide();
+        }
+    };
+    /**
+     * Touch listener to use for in-layout UI controls to delay hiding the
+     * system UI. This is to prevent the jarring behavior of controls going away
+     * while interacting with activity UI.
+     */
+    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (AUTO_HIDE) {
+                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            }
+            return false;
         }
     };
     //Oggetto partita
@@ -141,15 +145,19 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     private GeomagneticField geomagneticField;
     private double bearing = 0;
     private CompassView mCompassView;
-
     //Riferimento al DB
     private DataBaseHelper mHelper;
-
     //Titolo del Target
     private String mTitleTarget;
-
     //Nome delle Pref
     private String PREFERENCE_FILENAME;
+    //Riferimento al fragment della History (per aggiungere percorso)
+    private HistoryFragment mHistoryFragment;
+    //Oggetto percorso, verrà consegnato poi alla mainactivity
+    private Percorso mPercorso;
+
+    //Preference di gioco
+    private SharedPreferences mGameSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -262,22 +270,44 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
 
         //Prendo l'username dalle Pref
         PREFERENCE_FILENAME = getString(R.string.filename_pref);
-        SharedPreferences gameSettings = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
-        String user = gameSettings.getString(getString(R.string.username_pref), "");
+        mGameSettings = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        String user = mGameSettings.getString(getString(R.string.username_pref), "");
+
 
         //Inizializzo la logica del gioco
         mPartita = new Partita(new LatLng(latTarget, lngTarget),
                 new LatLng(lastLat, lastLong), titletarget, mDistance);
 
-        //VERIFICA DELLA DISTANZA IN RELAZIONE AL RANGE
+        //Creo il percorso
+        mPercorso = new Percorso(mTitleTarget, new LatLng(mLatTarget, mLongTarget), user);
+
+        //AGGIUNGO POSIZIONE ATTUALE ALLA LISTA DEI PUNTI
+        mPercorso.addPoint(new LatLng(lastLat, lastLong));
+
+        //VERIFICA DELLA DISTANZA IN RELAZIONE AL RANGE (Situazione vittoria immediata)
         if(mDistance <= RANGE){
+            //Setta il punteggio per il percorso
             int points = mPartita.finishMatch();
-            //TODO: AGGIUNGO POSIZIONE ATTUALE ALLA LISTA DEI PUNTI
-            //TODO: SALVO NELLA LISTA CONDIVISA IL PERCORSO
-            //TODO: AGGIUNGO I PUNTI ALLA PREFERENCE DEDICATA
-            //TODO: RIMUOVO DAL DB IL TARGET APPENA RAGGIUNTO (NOME)
-            //TODO: MOSTRO UN TOAST CON OBIETTIVO RAGGIUNTO
-            //TODO: TORNO ALLA MAINACTIVITY
+            mPercorso.setPrize(points);
+
+            //Aggiorno il punteggio nelle preference
+            int actualPoints = mGameSettings.getInt(getString(points_pref), 0);
+            mGameSettings.edit().putInt(getString(points_pref), points+actualPoints).apply();
+
+            //Rimuovo dal DB il target appena raggiunto
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mHelper.deleteTarget(mTitleTarget);
+                }
+            });
+
+            //Torno alla main activity inviando come Intent il percorso svolto
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra(getString(R.string.percorso_intent_name),
+                    (new Gson()).toJson(mPercorso));
+            setResult(Activity.RESULT_OK,returnIntent);
+            finish();
         }
 
         //Prendo riferimento al LocationManager
@@ -292,18 +322,36 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                     //Aggiornamento Location
                     mCurrentLocation = location;
 
-                    //TODO: FINE PARTITA SE DIST <= RANGE
+                    //AGGIUNGO POSIZIONE ATTUALE ALLA LISTA DEI PUNTI
+                    mPercorso.addPoint(new LatLng(mCurrentLocation.getLatitude(),
+                            mCurrentLocation.getLongitude()));
+
+                    //FINE PARTITA SE DIST <= RANGE
                     //VERIFICA DELLA DISTANZA IN RELAZIONE AL RANGE
                     if(mDistance <= RANGE){
-                        //TODO: AGGIUNGO POSIZIONE ATTUALE ALLA LISTA DEI PUNTI
-                        //TODO: SALVO NELLA LISTA CONDIVISA IL PERCORSO
-                        //TODO: AGGIUNGO I PUNTI ALLA PREFERENCE DEDICATA
-                        //TODO: RIMUOVO DAL DB IL TARGET APPENA RAGGIUNTO (NOME)
-                        //TODO: MOSTRO UN TOAST CON OBIETTIVO RAGGIUNTO
-                        //TODO: TORNO ALLA MAINACTIVITY
-                    }
+                        //Setta il punteggio per il percorso
+                        int points = mPartita.finishMatch();
+                        mPercorso.setPrize(points);
 
-                    //TODO: MI TENGO IN MEMORIA IL PERCORSO
+                        //Aggiorno il punteggio nelle preference
+                        int actualPoints = mGameSettings.getInt(getString(points_pref), 0);
+                        mGameSettings.edit().putInt(getString(points_pref), points+actualPoints).apply();
+
+                        //Rimuovo dal DB il target appena raggiunto
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mHelper.deleteTarget(mTitleTarget);
+                            }
+                        });
+
+                        //Torno alla main activity inviando come Intent il percorso svolto
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra(getString(R.string.percorso_intent_name),
+                                (new Gson()).toJson(mPercorso, Percorso.class));
+                        setResult(Activity.RESULT_OK,returnIntent);
+                        finish();
+                    }
 
                     // used to update location info on screen
                     runOnUiThread(new Runnable() {
@@ -321,7 +369,7 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             }
         };
         mMyLocation = new MyLocation(mLocationManager, this);
-        mMyLocation.getLocationForCompass(this, mLocationResult, latTarget, lngTarget);
+        mMyLocation.setDistanceForUpdates(this, mLocationResult, MINDISTANCE_UPDATES);
     }
 
     private void updateLocation(Location loc){
@@ -361,7 +409,12 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                         // if this button is clicked, close
                         // current activity
                         // This ID represents the Home or Up button.
-                        NavUtils.navigateUpFromSameTask(activ);
+
+                        //Annullo la partita in corso
+                        if(mPartita!=null)
+                            mPartita.finishMatch();
+
+                        finish();
                     }
                 })
                 .setNegativeButton("No",new DialogInterface.OnClickListener() {

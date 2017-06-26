@@ -1,5 +1,6 @@
 package com.sisbarra.orienteegame;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -19,8 +20,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import static com.sisbarra.orienteegame.MainActivity.PREFERENCE_FILENAME;
+import static com.sisbarra.orienteegame.R.string.percorso_intent_name;
 
 
 /**
@@ -133,7 +138,7 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
                 intent.putExtra(getString(R.string.lastLat), lastlat);
                 intent.putExtra(getString(R.string.lastLong), lastlong);
                 intent.putExtra(getString(R.string.titleTarget_name), titleTarget);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         }).start();
     }
@@ -300,5 +305,33 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoaderReset(Loader loader) {
 
+    }
+
+    /**
+     * Usato per mandare il percorso appena effettuato al terzo fragment
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                //Ricavo il percorso effettuato dall'intent
+                Gson gson = new Gson();
+                String strObj = getActivity().getIntent().
+                        getStringExtra(getString(percorso_intent_name));
+                Percorso perc = gson.fromJson(strObj, Percorso.class);
+
+                //Notifico il cambiamento dei dati per il cursoradapter
+                mAdapter.notifyDataSetChanged();
+
+                //TODO: CHIAMO IL METODO DEL TERZO FRAGMENT PER MANDARGLI IL PERCORSO FATTO
+
+                //Faccio vedere un toast per notificare l'obiettivo raggiunto
+                Toast.makeText(getActivity(), R.string.obiettivo_raggiunto_toast,
+                        Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
