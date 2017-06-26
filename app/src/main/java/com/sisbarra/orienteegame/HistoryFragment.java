@@ -23,7 +23,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -47,8 +49,7 @@ public class HistoryFragment extends Fragment {
 
 
     public static HistoryFragment newInstance() {
-        HistoryFragment fragment = new HistoryFragment();
-        return fragment;
+        return new HistoryFragment();
     }
 
     @Override
@@ -104,6 +105,22 @@ public class HistoryFragment extends Fragment {
         }
     }
 
+    //Salva nello storage interno il JSON dei percorsi
+    private void storePaths(){
+        Type listOfPercorsi = new TypeToken<List<Percorso>>(){}.getType();
+        Gson gson = new Gson();
+        try {
+            OutputStream fos = getActivity().openFileOutput(getString(R.string.mypaths_filename)
+                    , Context.MODE_PRIVATE);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
+            writer.write(gson.toJson(percorsi, listOfPercorsi));
+            fos.close();
+        } catch (Exception e1) {
+            Log.e(TAG, e1.toString());
+            getActivity().finish();
+        }
+    }
+
         /**
      * Called when the Fragment is no longer started.  This is generally
      * tied to {Activity#onStop() Activity.onStop} of the containing
@@ -112,6 +129,9 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+
+        //Devo salvare nel file JSON i percorsi miei effettuati fino adesso
+        storePaths();
     }
 
     //Classe privata che mi serve per caricare il JSON dai file dell'app

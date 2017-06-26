@@ -14,16 +14,16 @@ import java.util.ArrayList;
  * Classe adapter che costruisce la view dei miei percorsi.
  */
 
-public class MyPathsAdapter extends ArrayAdapter {
+class MyPathsAdapter extends ArrayAdapter<Percorso> {
 
-    public MyPathsAdapter(Context context, ArrayList<Percorso> percorsi) {
+    MyPathsAdapter(Context context, ArrayList<Percorso> percorsi) {
         super(context, 0, percorsi);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        Percorso perc = (Percorso) getItem(position);
+        Percorso perc = getItem(position);
         MyPathsAdapter.ViewHolder viewHolder; // view lookup cache stored in tag
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
