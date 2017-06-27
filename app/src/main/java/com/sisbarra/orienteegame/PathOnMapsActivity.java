@@ -10,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -44,6 +45,13 @@ public class PathOnMapsActivity extends FragmentActivity implements OnMapReadyCa
         line.setPoints(mPercorso.getPointsLists());
     }
 
+    //Setta lo stile per la mappa
+    private void setStyleMap(){
+        MapStyleOptions style = MapStyleOptions.loadRawResourceStyle(
+                this, R.raw.style_json);
+        mMap.setMapStyle(style);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +78,9 @@ public class PathOnMapsActivity extends FragmentActivity implements OnMapReadyCa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        //Setta lo stile per la mappa
+        setStyleMap();
 
         // Disegna il percorso effettuato
         drawPath();
