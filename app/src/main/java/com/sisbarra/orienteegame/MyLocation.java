@@ -111,6 +111,7 @@ class MyLocation {
 
         }
 
+        /* QUI SOLO LA DISTANZA CONTA, SENZA AVER PERCORSO I M NECESSARI NON ARRIVA AGGIORNAMENTO */
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, minDistance,
                     locationListenerGps);
 
@@ -156,9 +157,9 @@ class MyLocation {
 
             net_loc = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-            //if there are both values use the latest one
+            //Prendo come valore l'ultimo in ordine di tempo
             if (gps_loc != null && net_loc != null) {
-                if (gps_loc.getTime() > net_loc.getTime())
+                if (gps_loc.getTime() >= net_loc.getTime())
                     locationResult.gotLocation(gps_loc);
                 else
                     locationResult.gotLocation(net_loc);
