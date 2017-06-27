@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,9 +37,9 @@ class DataBaseHelper extends SQLiteOpenHelper {
     /**
      * Constructor
      * Si tiene un riferimento al Context per accedere alle risorse
-     * @param context
+     * param context
      */
-    public DataBaseHelper(Context context) throws PackageManager.NameNotFoundException {
+    DataBaseHelper(Context context) throws PackageManager.NameNotFoundException {
         super(context, DB_NAME, null, 1);
 
         DB_PATH = context.getPackageManager().getPackageInfo(
@@ -144,12 +145,14 @@ class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
-    /**
-     * TODO: Non faccio nulla qui
-     */
+    // Method is called during an upgrade of the database,
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+    public void onUpgrade(SQLiteDatabase database,int oldVersion,int newVersion){
+        Log.w(DataBaseHelper.class.getName(),
+                "Upgrading database from version " + oldVersion + " to "
+                        + newVersion + ", which will destroy all old data");
+        database.execSQL(myContext.getString(R.string.drop_targets_text));
+        onCreate(database);
     }
 
     //Cancella un target dal DB
@@ -162,8 +165,4 @@ class DataBaseHelper extends SQLiteOpenHelper {
         return myDataBase.query(true, myContext.getString(R.string.name_table_targets),
                 new String[]{ID_COLUMN, NAME_COLUMN, LAT_COLUMN, LONG_COLUMN}, null, null, null, null, null, null);
     }
-
-    // TODO: Add your public helper methods to access and get content from the database.
-    // TODO: You could return cursors by doing "return myDataBase.query(....)" so it'd be easy
-    // TODO: to you to create adapters for your views.
 }
