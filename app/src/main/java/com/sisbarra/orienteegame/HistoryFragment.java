@@ -66,12 +66,22 @@ public class HistoryFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_history, container, false);
     }
 
+    /**
+     * Called when the Fragment is visible to the user.  This is generally
+     * tied to {Activity.onStart} of the containing
+     * Activity's lifecycle.
+     */
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onStart() {
+        super.onStart();
 
         //Carico il JSON dei miei percorsi
         new HistoryFragment.LoadingPathTask().execute();
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     //Carica dallo storage interno il file Json con i miei percorsi personali
@@ -124,6 +134,13 @@ public class HistoryFragment extends Fragment {
             Log.e(TAG, e1.toString());
             getActivity().finish();
         }
+    }
+
+    //Dato un percorso aggiorna la lista dei MyPaths
+    void refreshMyPaths(Percorso p){
+        //Aggiungo il percorso alla lista dei percorsi e aggiorno l'adapter
+        percorsi.add(p);
+        ((MyPathsAdapter) mPaths.getAdapter()).notifyDataSetChanged();
     }
 
         /**

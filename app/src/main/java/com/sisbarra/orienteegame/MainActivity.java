@@ -354,6 +354,15 @@ public class MainActivity extends AppCompatActivity {
         return mLastLocation;
     }
 
+    //Aggiorna il terzo fragment con il percorso effettuato
+    void refreshMyPaths(Percorso p){
+        //Prendo riferimento al fragment e gli spedisco il percorso
+        HistoryFragment frag = (HistoryFragment)
+                mSectionsPagerAdapter.getRegisteredFragment(2);
+
+        frag.refreshMyPaths(p);
+    }
+
     @Override
     //TODO: DA IMPLEMENTARE ANCORA
     public boolean onCreateOptionsMenu(Menu menu) {

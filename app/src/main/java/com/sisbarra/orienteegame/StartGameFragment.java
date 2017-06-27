@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -34,7 +33,6 @@ import static com.sisbarra.orienteegame.R.string.percorso_intent_name;
  */
 public class StartGameFragment extends Fragment implements LoaderManager.LoaderCallbacks {
 
-    private LocationManager mLocationManager;
     private ListView mLstTargets;
     //Riferimento al DB
     private DataBaseHelper mHelper;
@@ -84,7 +82,8 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
     public void setTargetText(String text){
         AppCompatTextView txtView = (AppCompatTextView)
                 mMainActivity.findViewById(R.id.targetTxt);
-        txtView.setText(text);
+        if(txtView!=null)
+            txtView.setText(text);
     }
 
     //Metodo che aggiorna la posizione attuale nel cursoradapter
@@ -187,7 +186,7 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
      * Called when a fragment is first attached to its context.
      * {@link #onCreate(Bundle)} will be called after this.
      *
-     * @param context
+     * param context
      */
     @Override
     public void onAttach(Context context) {
@@ -309,9 +308,6 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
 
     /**
      * Usato per mandare il percorso appena effettuato al terzo fragment
-     * @param requestCode
-     * @param resultCode
-     * @param data
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -339,7 +335,8 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
                     }
                 }).start();
 
-                //TODO: CHIAMO IL METODO DEL TERZO FRAGMENT PER MANDARGLI IL PERCORSO FATTO
+                //Aggiorno la list del terzo fragment
+                ((MainActivity) getActivity()).refreshMyPaths(perc);
 
                 //Faccio vedere un toast per notificare l'obiettivo raggiunto
                 Toast.makeText(getActivity(), R.string.obiettivo_raggiunto_toast,

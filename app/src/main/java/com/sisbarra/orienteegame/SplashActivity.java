@@ -21,6 +21,7 @@ public class SplashActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
+            return;
         }
 
         //Controllo i permessi per la localizzazione
@@ -74,14 +75,15 @@ public class SplashActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
                     finish();
+                    return;
 
                 } else {
 
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                     finish();
+                    return;
                 }
-                return;
             }
 
             // other 'case' lines to check for other
