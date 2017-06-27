@@ -40,7 +40,7 @@ public class PathOnMapsActivity extends FragmentActivity implements OnMapReadyCa
             return;
         }
 
-        Polyline line = mMap.addPolyline(new PolylineOptions().width(3).color(Color.RED).
+        Polyline line = mMap.addPolyline(new PolylineOptions().color(Color.RED).
                 geodesic(true));
         line.setPoints(mPercorso.getPointsLists());
     }
@@ -85,9 +85,12 @@ public class PathOnMapsActivity extends FragmentActivity implements OnMapReadyCa
         // Disegna il percorso effettuato
         drawPath();
 
-        // Add a marker in Target and move the camera
+        // Add a marker in start and in Target and move the camera
         LatLng target = mPercorso.getTarget();
-        mMap.addMarker(new MarkerOptions().position(target).title(mPercorso.getNameTarget()));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(target));
+        LatLng start = mPercorso.getPointsLists().get(0);
+        mMap.addMarker(new MarkerOptions().position(start).title("Partenza"));
+        mMap.addMarker(new MarkerOptions().position(target).title("Obiettivo: "+
+                mPercorso.getNameTarget()));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 16));
     }
 }

@@ -2,6 +2,7 @@ package com.sisbarra.orienteegame;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
@@ -143,6 +145,14 @@ public class HistoryFragment extends Fragment {
         ((MyPathsAdapter) mPaths.getAdapter()).notifyDataSetChanged();
     }
 
+    //Dato un percorso fa partire la Path on map Activity con quel percorso come intent
+    void startPathMapActivity(Percorso p){
+        Intent intent = new Intent(getContext(), PathOnMapsActivity.class);
+        intent.putExtra(getString(R.string.percorso_intent_name),
+                (new Gson()).toJson(p));
+        startActivity(intent);
+    }
+
         /**
      * Called when the Fragment is no longer started.  This is generally
      * tied to {Activity#onStop() Activity.onStop} of the containing
@@ -173,10 +183,16 @@ public class HistoryFragment extends Fragment {
             super.onPostExecute(percorsos);
 
             //CREAZIONE DI ADAPTER E COLLEGAMENTO CON LA LISTVIEW
-            MyPathsAdapter adapter = new MyPathsAdapter(getContext(), percorsos);
+            final MyPathsAdapter adapter = new MyPathsAdapter(getContext(), percorsos);
             // Attach the adapter to a ListView
             mPaths = (ListView) getActivity().findViewById(R.id.historyPaths_listview);
             mPaths.setAdapter(adapter);
+            mPaths.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    startPathMapActivity(adapter.getItem(position));
+                }
+            });
             getActivity().findViewById(R.id.loadingMyPathPanel).setVisibility(View.GONE);
         }
     }
