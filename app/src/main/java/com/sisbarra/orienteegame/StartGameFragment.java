@@ -73,11 +73,6 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
         txtView.setText(text);
     }
 
-    //Restituisce la lista dei target alla mainactivity
-    public ListView getListTargets(){
-        return mLstTargets;
-    }
-
     //Modifica la textview degli obiettivi
     public void setTargetText(String text){
         AppCompatTextView txtView = (AppCompatTextView)
