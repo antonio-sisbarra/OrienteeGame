@@ -154,7 +154,7 @@ class DataBaseHelper extends SQLiteOpenHelper {
 
     //Cancella un target dal DB
     void deleteTarget(String name){
-        myDataBase.delete(DATABASE_TABLE, NAME_COLUMN + "=" + name, null);
+        myDataBase.delete(DATABASE_TABLE, NAME_COLUMN + "= '" + name +"' ", null);
     }
 
     Cursor getAllTargetCursor(){

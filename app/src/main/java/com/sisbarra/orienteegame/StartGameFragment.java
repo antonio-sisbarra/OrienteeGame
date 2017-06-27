@@ -319,12 +319,25 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
             if(resultCode == Activity.RESULT_OK){
                 //Ricavo il percorso effettuato dall'intent
                 Gson gson = new Gson();
-                String strObj = getActivity().getIntent().
-                        getStringExtra(getString(percorso_intent_name));
-                Percorso perc = gson.fromJson(strObj, Percorso.class);
+                String strObj = data.getStringExtra(getString(percorso_intent_name));
+                final Percorso perc = gson.fromJson(strObj, Percorso.class);
 
-                //Notifico il cambiamento dei dati per il cursoradapter
-                mAdapter.notifyDataSetChanged();
+                //Rimuovo dal DB il target appena raggiunto
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mHelper.deleteTarget(perc.getNameTarget());
+                        final Cursor newCurs = mHelper.getAllTargetCursor();
+                        //Notifico il cambiamento dei dati per il cursoradapter
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAdapter.changeCursor(newCurs);
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                }).start();
 
                 //TODO: CHIAMO IL METODO DEL TERZO FRAGMENT PER MANDARGLI IL PERCORSO FATTO
 

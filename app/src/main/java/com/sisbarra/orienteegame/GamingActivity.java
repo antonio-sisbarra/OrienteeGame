@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -71,6 +70,20 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             }
         }
     };
+    /**
+     * Touch listener to use for in-layout UI controls to delay hiding the
+     * system UI. This is to prevent the jarring behavior of controls going away
+     * while interacting with activity UI.
+     */
+    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (AUTO_HIDE) {
+                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            }
+            return false;
+        }
+    };
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -94,20 +107,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         @Override
         public void run() {
             hide();
-        }
-    };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
         }
     };
     //Oggetto partita
@@ -145,8 +144,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     private GeomagneticField geomagneticField;
     private double bearing = 0;
     private CompassView mCompassView;
-    //Riferimento al DB
-    private DataBaseHelper mHelper;
     //Titolo del Target
     private String mTitleTarget;
     //Nome delle Pref
@@ -179,13 +176,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                 toggle();
             }
         });
-
-        //Riferimento al DB
-        try {
-            mHelper = new DataBaseHelper(this);
-        } catch (PackageManager.NameNotFoundException e) {
-            finish();
-        }
 
         //Riferimenti al layout
         getLayoutReferences();
@@ -294,20 +284,13 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             int actualPoints = mGameSettings.getInt(getString(points_pref), 0);
             mGameSettings.edit().putInt(getString(points_pref), points+actualPoints).apply();
 
-            //Rimuovo dal DB il target appena raggiunto
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mHelper.deleteTarget(mTitleTarget);
-                }
-            });
-
             //Torno alla main activity inviando come Intent il percorso svolto
             Intent returnIntent = new Intent();
             returnIntent.putExtra(getString(R.string.percorso_intent_name),
                     (new Gson()).toJson(mPercorso));
             setResult(Activity.RESULT_OK,returnIntent);
             finish();
+            return;
         }
 
         //Prendo riferimento al LocationManager
@@ -337,18 +320,10 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                         int actualPoints = mGameSettings.getInt(getString(points_pref), 0);
                         mGameSettings.edit().putInt(getString(points_pref), points+actualPoints).apply();
 
-                        //Rimuovo dal DB il target appena raggiunto
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mHelper.deleteTarget(mTitleTarget);
-                            }
-                        });
-
                         //Torno alla main activity inviando come Intent il percorso svolto
                         Intent returnIntent = new Intent();
                         returnIntent.putExtra(getString(R.string.percorso_intent_name),
-                                (new Gson()).toJson(mPercorso, Percorso.class));
+                                (new Gson()).toJson(mPercorso));
                         setResult(Activity.RESULT_OK,returnIntent);
                         finish();
                     }
@@ -448,7 +423,8 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         // remove listeners
         mSensorManager.unregisterListener(this, mSensorGravity);
         mSensorManager.unregisterListener(this, mSensorMagnetic);
-        mMyLocation.removeUpdates();
+        if(mMyLocation!=null)
+            mMyLocation.removeUpdates();
     }
 
     @Override

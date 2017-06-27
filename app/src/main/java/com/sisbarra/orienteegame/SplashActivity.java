@@ -15,6 +15,14 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //Se sono in versioni precedenti devo fare la finish() adesso
+        if(android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP){
+            //Qui creo intent per creare l'activity vera e propria
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         //Controllo i permessi per la localizzazione
         //Controllo esplicitamente i permessi
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -28,13 +36,6 @@ public class SplashActivity extends AppCompatActivity {
 
         }
         else{
-            //Qui creo intent per creare l'activity vera e propria
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        }
-
-        //Se sono in versioni precedenti devo fare la finish() adesso
-        if(android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP){
             //Qui creo intent per creare l'activity vera e propria
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
@@ -72,6 +73,7 @@ public class SplashActivity extends AppCompatActivity {
                     //Qui creo intent per creare l'activity vera e propria
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
+                    finish();
 
                 } else {
 
