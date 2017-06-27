@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.SQLException;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -22,7 +21,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -181,19 +179,13 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case 0: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length <= 0
+                        || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
 
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    finish();
-                }
-                return;
+                            // permission denied, boo! Disable the
+                            // functionality that depends on this permission.
+                            finish();
+                        }
             }
 
             // other 'case' lines to check for other
@@ -212,11 +204,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     throw new Error(getString(R.string.error_create_db));
                 }
-                try {
-                    mHelper.openDataBase();
-                } catch (SQLException sqle) {
-                    throw sqle;
-                }
+                mHelper.openDataBase();
             }
         }).start();
     }
@@ -230,11 +218,11 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             mGpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch(Exception ex) {}
+        } catch(Exception ignored) {}
 
         try {
             mNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch(Exception ex) {}
+        } catch(Exception ignored) {}
 
         if(!mNetworkEnabled && !mGpsEnabled) {
             // notify user
@@ -328,17 +316,17 @@ public class MainActivity extends AppCompatActivity {
     //Setta le icone e il testo per le tab
     private void setupTabIcons() {
 
-        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        TextView tabOne = (TextView) View.inflate(this, R.layout.custom_tab, null);
         tabOne.setText(R.string.tab_one);
         tabOne.setCompoundDrawablesWithIntrinsicBounds(0, mTabIcons[0], 0, 0);
         mTabLayout.getTabAt(0).setCustomView(tabOne);
 
-        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        TextView tabTwo = (TextView) View.inflate(this, R.layout.custom_tab, null);
         tabTwo.setText(R.string.tab_two);
         tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, mTabIcons[1], 0, 0);
         mTabLayout.getTabAt(1).setCustomView(tabTwo);
 
-        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        TextView tabThree = (TextView) View.inflate(this, R.layout.custom_tab, null);
         tabThree.setText(R.string.tab_three);
         tabThree.setCompoundDrawablesWithIntrinsicBounds(0, mTabIcons[2], 0, 0);
         mTabLayout.getTabAt(2).setCustomView(tabThree);
@@ -364,7 +352,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    //TODO: DA IMPLEMENTARE ANCORA
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -372,7 +359,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    //TODO: DA IMPLEMENTARE ANCORA
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -381,6 +367,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //Mostra un Dialog per prendere l'user
+            showCreateUserDialog();
             return true;
         }
 
@@ -391,11 +379,11 @@ public class MainActivity extends AppCompatActivity {
      * Un {@link FragmentPagerAdapter} che restituisce il fragment corrispondente a
      * una sezione.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -445,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
-        public Fragment getRegisteredFragment(int position) {
+        Fragment getRegisteredFragment(int position) {
             return registeredFragments.get(position);
         }
     }
