@@ -36,7 +36,7 @@ class CompassView extends View {
 
     private void initialize() {
         matrix = new Matrix();
-        // Crea la bitmpa per l'icona della bussola
+        // Crea la bitmap per l'icona della bussola
         bitmap = BitmapFactory.decodeResource(getResources(),
                 R.drawable.compass_icon);
     }
@@ -131,6 +131,7 @@ class CompassView extends View {
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        //Faccio fare il lavoro alla superclasse e mi attengo a quelle dimensioni
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         width = MeasureSpec.getSize(widthMeasureSpec);
         height = MeasureSpec.getSize(heightMeasureSpec);
