@@ -9,6 +9,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,7 +24,7 @@ class MyLocation {
     private LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
-
+    private Activity mActivity;
     //I listener
     private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
@@ -32,6 +33,9 @@ class MyLocation {
         }
 
         public void onProviderDisabled(String provider) {
+            //Faccio vedere un toast per notificare l'obiettivo raggiunto
+            Toast.makeText(mActivity, R.string.location_off_toast,
+                    Toast.LENGTH_LONG).show();
         }
 
         public void onProviderEnabled(String provider) {
@@ -47,6 +51,9 @@ class MyLocation {
         }
 
         public void onProviderDisabled(String provider) {
+            //Faccio vedere un toast per notificare l'obiettivo raggiunto
+            Toast.makeText(mActivity, R.string.location_off_toast,
+                    Toast.LENGTH_LONG).show();
         }
 
         public void onProviderEnabled(String provider) {
@@ -55,7 +62,6 @@ class MyLocation {
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
     };
-    private Activity mActivity;
 
     MyLocation(LocationManager lm, Activity activ) {
         mLocationManager = lm;
