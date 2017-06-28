@@ -46,6 +46,9 @@ public class HistoryFragment extends Fragment {
     //Riferimenti a strutture dati
     private ArrayList<Percorso> percorsi;
 
+    //Arraryadapter per i dati
+    private MyPathsAdapter mAdapter;
+
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -77,8 +80,9 @@ public class HistoryFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        //Carico il JSON dei miei percorsi
-        new HistoryFragment.LoadingPathTask().execute();
+        //Carico il JSON dei miei percorsi (se non ci sono percorsi)
+        if(percorsi == null)
+            new HistoryFragment.LoadingPathTask().execute();
     }
 
     @Override
@@ -141,8 +145,8 @@ public class HistoryFragment extends Fragment {
     //Dato un percorso aggiorna la lista dei MyPaths
     void refreshMyPaths(Percorso p){
         //Aggiungo il percorso alla lista dei percorsi e aggiorno l'adapter
-        percorsi.add(p);
-        ((MyPathsAdapter) mPaths.getAdapter()).notifyDataSetChanged();
+        mAdapter.add(p);
+        mAdapter.notifyDataSetChanged();
     }
 
     //Dato un percorso fa partire la Path on map Activity con quel percorso come intent
@@ -183,14 +187,14 @@ public class HistoryFragment extends Fragment {
             super.onPostExecute(percorsos);
 
             //CREAZIONE DI ADAPTER E COLLEGAMENTO CON LA LISTVIEW
-            final MyPathsAdapter adapter = new MyPathsAdapter(getContext(), percorsos);
+            mAdapter = new MyPathsAdapter(getContext(), percorsos);
             // Attach the adapter to a ListView
             mPaths = (ListView) getActivity().findViewById(R.id.historyPaths_listview);
-            mPaths.setAdapter(adapter);
+            mPaths.setAdapter(mAdapter);
             mPaths.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    startPathMapActivity(adapter.getItem(position));
+                    startPathMapActivity(mAdapter.getItem(position));
                 }
             });
             getActivity().findViewById(R.id.loadingMyPathPanel).setVisibility(View.GONE);

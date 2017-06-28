@@ -9,6 +9,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -88,7 +89,9 @@ public class PathOnMapsActivity extends FragmentActivity implements OnMapReadyCa
         // Add a marker in start and in Target and move the camera
         LatLng target = mPercorso.getTarget();
         LatLng start = mPercorso.getPointsLists().get(0);
-        mMap.addMarker(new MarkerOptions().position(start).title("Partenza"));
+        mMap.addMarker(new MarkerOptions().position(start)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                .title("Partenza"));
         mMap.addMarker(new MarkerOptions().position(target).title("Obiettivo: "+
                 mPercorso.getNameTarget()));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 16));

@@ -70,6 +70,20 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             }
         }
     };
+    /**
+     * Touch listener to use for in-layout UI controls to delay hiding the
+     * system UI. This is to prevent the jarring behavior of controls going away
+     * while interacting with activity UI.
+     */
+    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (AUTO_HIDE) {
+                delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            }
+            return false;
+        }
+    };
     private View mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -93,20 +107,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         @Override
         public void run() {
             hide();
-        }
-    };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
         }
     };
     //Oggetto partita
@@ -309,6 +309,19 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                     mPercorso.addPoint(new LatLng(mCurrentLocation.getLatitude(),
                             mCurrentLocation.getLongitude()));
 
+                    //Aggiorno le info a schermo
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateLocation(mCurrentLocation);
+                        }
+                    });
+                    geomagneticField = new GeomagneticField(
+                            (float) mCurrentLocation.getLatitude(),
+                            (float) mCurrentLocation.getLongitude(),
+                            (float) mCurrentLocation.getAltitude(),
+                            System.currentTimeMillis());
+
                     //FINE PARTITA SE DIST <= RANGE
                     //VERIFICA DELLA DISTANZA IN RELAZIONE AL RANGE
                     if(mDistance <= RANGE){
@@ -327,19 +340,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                         setResult(Activity.RESULT_OK,returnIntent);
                         finish();
                     }
-
-                    // used to update location info on screen
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateLocation(mCurrentLocation);
-                        }
-                    });
-                    geomagneticField = new GeomagneticField(
-                            (float) mCurrentLocation.getLatitude(),
-                            (float) mCurrentLocation.getLongitude(),
-                            (float) mCurrentLocation.getAltitude(),
-                            System.currentTimeMillis());
                 }
             }
         };
