@@ -28,6 +28,9 @@ class MyLocation {
     //I listener
     private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
+            //Non accetto la location se l'errore stimato è il quadruplo del range del game activ.
+            if(location.getAccuracy()>=(4*GamingActivity.RANGE))
+                return;
             timer1.cancel();
             locationResult.gotLocation(location);
         }
@@ -46,6 +49,9 @@ class MyLocation {
     };
     private LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
+            //Non accetto la location se l'errore stimato è il quadruplo del range del game activ.
+            if(location.getAccuracy()>=(4*GamingActivity.RANGE))
+                return;
             timer1.cancel();
             locationResult.gotLocation(location);
         }
@@ -121,7 +127,8 @@ class MyLocation {
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, minDistance,
                     locationListenerGps);
 
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, minDistance,
+        //Preferisco il GPS, richiedendo meno aggiornamenti dalla localizzazione di rete
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, minDistance+5,
                     locationListenerNetwork);
 
         timer1 = new Timer();
@@ -163,9 +170,9 @@ class MyLocation {
 
             net_loc = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-            //Prendo come valore l'ultimo in ordine di tempo
+            //Prendo come valore il più accurato
             if (gps_loc != null && net_loc != null) {
-                if (gps_loc.getTime() >= net_loc.getTime())
+                if (net_loc.getAccuracy() >= gps_loc.getAccuracy())
                     locationResult.gotLocation(gps_loc);
                 else
                     locationResult.gotLocation(net_loc);

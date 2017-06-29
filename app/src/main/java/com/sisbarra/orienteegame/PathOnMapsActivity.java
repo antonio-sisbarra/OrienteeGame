@@ -10,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -94,6 +95,11 @@ public class PathOnMapsActivity extends FragmentActivity implements OnMapReadyCa
                 .title("Partenza"));
         mMap.addMarker(new MarkerOptions().position(target).title("Obiettivo: "+
                 mPercorso.getNameTarget()));
+        mMap.addCircle(new CircleOptions()
+                .center(target)
+                .radius(GamingActivity.RANGE)
+                .strokeColor(Color.RED)
+                .fillColor(Color.BLUE));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 16));
     }
 }
