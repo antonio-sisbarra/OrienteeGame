@@ -12,6 +12,10 @@
           },
           {
               "latitude":43.710775,"longitude":10.397714
+          },
+        {
+          "latitude": 43.71083,
+          "longitude": 10.39782
           }
       ],
        "nameTarget":"Piazza Emanuele",
@@ -35,6 +39,10 @@
       },
       {
         "latitude":43.718257,"longitude":10.404053
+      },
+      {
+        "latitude": 43.71823,
+        "longitude": 10.40424
       }
     ],
     "nameTarget":"Odeon",

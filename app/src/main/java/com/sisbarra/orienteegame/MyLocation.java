@@ -39,7 +39,7 @@ class MyLocation {
 
         public void onProviderDisabled(String provider) {
             //Faccio vedere un toast per notificare l'obiettivo raggiunto
-            Toast.makeText(mActivity, R.string.location_off_toast,
+            Toast.makeText(mActivity, R.string.location_off_gps_toast,
                     Toast.LENGTH_LONG).show();
         }
 
@@ -66,7 +66,7 @@ class MyLocation {
 
         public void onProviderDisabled(String provider) {
             //Faccio vedere un toast per notificare l'obiettivo raggiunto
-            Toast.makeText(mActivity, R.string.location_off_toast,
+            Toast.makeText(mActivity, R.string.location_off_net_toast,
                     Toast.LENGTH_LONG).show();
         }
 
