@@ -19,7 +19,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -42,16 +41,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     static final float ALPHA = 0.25f; // if ALPHA = 1 OR 0, no filter applies.
     //Costante per il range per la fine della partita
     static final int RANGE = 7;
-    /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
-    private static final boolean AUTO_HIDE = true;
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
     /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
@@ -95,20 +84,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             hide();
         }
     };
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (AUTO_HIDE) {
-                delayedHide(AUTO_HIDE_DELAY_MILLIS);
-            }
-            return false;
-        }
-    };
     //Oggetto partita
     private Partita mPartita;
     //LocationResult per il listener della posizione
@@ -130,7 +105,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     private double mLongTarget;
     //Distanza e direzione obiettivo
     private int mDistance;
-    private String mDirection;
     // Gravity for accelerometer data
     private float[] gravity = new float[3];
     // magnetic data
@@ -148,8 +122,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     private String mTitleTarget;
     //Nome delle Pref
     private String PREFERENCE_FILENAME;
-    //Riferimento al fragment della History (per aggiungere percorso)
-    private HistoryFragment mHistoryFragment;
     //Oggetto percorso, verrà consegnato poi alla mainactivity
     private Percorso mPercorso;
 
@@ -377,8 +349,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     private void createExitDialogBuilder(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this, AppAlertTheme);
-
-        final Activity activ = this;
 
         // set dialog message
         alertDialogBuilder

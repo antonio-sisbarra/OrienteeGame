@@ -26,6 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:textAlignment="center"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="@dimen/font_size_text_hello_game"/>
         </RelativeLayout>
@@ -40,6 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:textAlignment="center"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="@dimen/font_size_text_hello_game"/>
         </RelativeLayout>
@@ -57,6 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="30dp"
                 android:layout_marginRight="30dp"
+                android:textAlignment="center"
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/font_size_text_hello_game"/>
 
@@ -66,6 +69,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="30dp"
                 android:layout_marginRight="30dp"
+                android:textAlignment="center"
                 android:textColor="@color/colorPrimary"
                 android:textSize="@dimen/font_size_text_hello_game"/>
         </LinearLayout>
