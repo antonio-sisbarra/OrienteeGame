@@ -25,6 +25,7 @@ class MyLocation {
     private Timer timer1;
     private LocationManager mLocationManager;
     private Activity mActivity;
+    private Location mLastLoc;
     //I listener
     private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
@@ -32,6 +33,7 @@ class MyLocation {
             if(location.getAccuracy()>=(4*GamingActivity.RANGE))
                 return;
             timer1.cancel();
+            mLastLoc = location;
             locationResult.gotLocation(location);
         }
 
@@ -52,7 +54,13 @@ class MyLocation {
             //Non accetto la location se l'errore stimato è il quadruplo del range del game activ.
             if(location.getAccuracy()>=(4*GamingActivity.RANGE))
                 return;
+
+            //Non accetto la location se dall'ultima loc disponibile sono passati meno di range sec
+            if(mLastLoc!=null &&
+                    ((location.getTime()-mLastLoc.getTime())<=(GamingActivity.RANGE*1000)))
+                return;
             timer1.cancel();
+            mLastLoc = location;
             locationResult.gotLocation(location);
         }
 
