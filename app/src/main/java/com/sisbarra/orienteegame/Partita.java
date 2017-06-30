@@ -25,7 +25,7 @@ class Partita {
     private Timer mTimer; //Timer che diminuisce il punteggio
     private boolean mFinished = false; //Flag per capire se è finita la partita
 
-    public Partita(LatLng target, LatLng actualLocation, String title, int dist) {
+    Partita(LatLng target, LatLng actualLocation, String title, int dist) {
         mTarget = target;
         mActualLocation = actualLocation;
         mDistance = dist;
@@ -82,6 +82,10 @@ class Partita {
 
     public void setDistance(int distance) {
         mDistance = distance;
+    }
+
+    int getPrize() {
+        return mPrize;
     }
 
     public void setPrize(int prize) {

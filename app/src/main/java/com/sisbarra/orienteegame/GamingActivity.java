@@ -120,7 +120,7 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     //Riferimento al Sensor Manager
     private SensorManager mSensorManager;
     //TextView del layout
-    private TextView mTextDistance, mTextLat, mTextLong;
+    private TextView mTextDistance, mTextLat, mTextLong, mTextPrize;
     //Sensore magnetico e di gravità
     private Sensor mSensorMagnetic, mSensorGravity;
     //Location
@@ -209,6 +209,7 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     //Prende i riferimenti al layout
     private void getLayoutReferences(){
         mTextDistance = (TextView) findViewById(R.id.text_distance_gaming);
+        mTextPrize = (TextView) findViewById(R.id.text_prize_gaming);
         mTextLat = (TextView) findViewById(R.id.latitude);
         mTextLong = (TextView) findViewById(R.id.longitude);
         mCompassView = (CompassView) findViewById(R.id.compass);
@@ -267,6 +268,9 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         //Inizializzo la logica del gioco
         mPartita = new Partita(new LatLng(latTarget, lngTarget),
                 new LatLng(lastLat, lastLong), titletarget, mDistance);
+
+        //Inizializzo la text del prize
+        mTextPrize.setText("Il tempo scorre, adesso vinceresti " + mPartita.getPrize() + " punti!");
 
         //Creo il percorso
         mPercorso = new Percorso(mTitleTarget, new LatLng(mLatTarget, mLongTarget), user);
@@ -357,6 +361,7 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         mTextLong.setText(String.format("Long. %s", loc.getLongitude()));
         mDistance = distance(loc.getLatitude(), loc.getLongitude(), mLatTarget, mLongTarget);
         mTextDistance.setText("Sei distante "+mDistance+" m dall'obiettivo!");
+        mTextPrize.setText("Il tempo scorre, adesso vinceresti " + mPartita.getPrize() + " punti!");
     }
 
     //Metodo per filtrare i dati dei sensori

@@ -30,6 +30,20 @@
                 android:textSize="@dimen/font_size_text_hello_game"/>
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/custom_tab_layout_height">
+
+            <TextView
+                android:id="@+id/text_prize_gaming"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/font_size_text_hello_game"/>
+        </RelativeLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
