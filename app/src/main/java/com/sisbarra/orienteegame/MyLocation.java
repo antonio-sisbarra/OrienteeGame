@@ -29,9 +29,14 @@ class MyLocation {
     //I listener
     private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
-            //Non accetto la location se l'errore stimato è il quadruplo del range del game activ.
-            if(location.getAccuracy()>=(4*GamingActivity.RANGE))
+            //Non accetto la location, se ho già una location e se l'errore stimato è di range metri.
+            if (mLastLoc != null && location.getAccuracy() >= (GamingActivity.RANGE))
                 return;
+
+            //Non accetto comunque la location se accuracy è bassa
+            if (location.getAccuracy() > (3 * GamingActivity.RANGE))
+                return;
+
             timer1.cancel();
             mLastLoc = location;
             locationResult.gotLocation(location);
@@ -51,14 +56,14 @@ class MyLocation {
     };
     private LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
-            //Non accetto la location se l'errore stimato è il quadruplo del range del game activ.
-            if(location.getAccuracy()>=(4*GamingActivity.RANGE))
+            //Non accetto la location, se ho già una location e se l'errore stimato è di range metri.
+            if (mLastLoc != null && location.getAccuracy() >= (GamingActivity.RANGE))
                 return;
 
-            //Non accetto la location se dall'ultima loc disponibile sono passati meno di range sec
-            if(mLastLoc!=null &&
-                    ((location.getTime()-mLastLoc.getTime())<=(GamingActivity.RANGE*1000)))
+            //Non accetto comunque la location se accuracy è bassa
+            if (location.getAccuracy() > (3 * GamingActivity.RANGE))
                 return;
+
             timer1.cancel();
             mLastLoc = location;
             locationResult.gotLocation(location);
@@ -99,10 +104,10 @@ class MyLocation {
         }
 
 
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0,
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0,
                 locationListenerGps);
 
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 8000, 0,
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 0,
                 locationListenerNetwork);
 
         timer1 = new Timer();
@@ -140,7 +145,7 @@ class MyLocation {
                     locationListenerNetwork);
 
         timer1 = new Timer();
-        timer1.schedule(new GetLastLocation(), 20000);
+        timer1.schedule(new GetLastLocation(), 10000);
         return true;
     }
 

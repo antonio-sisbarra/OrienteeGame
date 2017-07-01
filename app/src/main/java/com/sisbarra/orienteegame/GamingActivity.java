@@ -47,7 +47,7 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
      */
     private static final int UI_ANIMATION_DELAY = 300;
     //MinDistance per aggiornamenti posizione (in metri)
-    private static final int MINDISTANCE_UPDATES = 5;
+    private static final int MINDISTANCE_UPDATES = 2;
     private final Handler mHideHandler = new Handler();
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
