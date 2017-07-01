@@ -214,10 +214,16 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
                 "");
 
         //Prendo le coordinate dell'ultima location avuta
-        final double lastLat = getIntent().getExtras().getDouble(getString(R.string.lastLat),
-                0);
-        final double lastLong = getIntent().getExtras().getDouble(getString(R.string.lastLong),
-                0);
+        final double lastLat, lastLong;
+        if (mCurrentLocation == null) {
+            lastLat = getIntent().getExtras().getDouble(getString(R.string.lastLat),
+                    0);
+            lastLong = getIntent().getExtras().getDouble(getString(R.string.lastLong),
+                    0);
+        } else {
+            lastLat = mCurrentLocation.getLatitude();
+            lastLong = mCurrentLocation.getLongitude();
+        }
 
         mLatTarget = latTarget;
         mLongTarget = lngTarget;
