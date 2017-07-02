@@ -298,7 +298,7 @@ public class StartGameFragment extends Fragment implements LoaderManager.LoaderC
      */
     @Override
     public void onLoaderReset(Loader loader) {
-
+        mAdapter.swapCursor(null);
     }
 
     /**
