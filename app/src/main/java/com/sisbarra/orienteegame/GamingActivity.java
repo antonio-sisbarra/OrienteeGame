@@ -342,7 +342,7 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
         mTextPrize.setText("Il tempo scorre, adesso vinceresti " + mPartita.getPrize() + " punti!");
     }
 
-    //Metodo per filtrare i dati dei sensori
+    //Metodo passa-basso per filtrare i dati dei sensori
     protected float[] lowPass( float[] input, float[] output ) {
         if ( output == null ) return input;
         for ( int i=0; i<input.length; i++ ) {
