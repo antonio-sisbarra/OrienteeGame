@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -104,11 +105,17 @@ class MyLocation {
 
         }
 
-
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0,
+        Criteria criteria_gps = new Criteria();
+        criteria_gps.setAccuracy(Criteria.ACCURACY_FINE);
+        String provider_fine = mLocationManager.getBestProvider(criteria_gps, true);
+        mLocationManager.requestLocationUpdates(provider_fine, 2000, 0,
                 locationListenerGps);
 
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 0,
+        Criteria criteria_net = new Criteria();
+        criteria_net.setAccuracy(Criteria.ACCURACY_COARSE);
+        criteria_net.setPowerRequirement(Criteria.POWER_LOW);
+        String provider_coarse = mLocationManager.getBestProvider(criteria_net, true);
+        mLocationManager.requestLocationUpdates(provider_coarse, 6000, 0,
                 locationListenerNetwork);
 
         timer1 = new Timer();
@@ -138,15 +145,22 @@ class MyLocation {
         }
 
         /* Registro due volte per avere almeno ogni tot secondi un aggiornamento */
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, minDistance,
+        Criteria criteria_gps = new Criteria();
+        criteria_gps.setAccuracy(Criteria.ACCURACY_FINE);
+        String provider_fine = mLocationManager.getBestProvider(criteria_gps, true);
+        mLocationManager.requestLocationUpdates(provider_fine, 0, minDistance,
                     locationListenerGps);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+        mLocationManager.requestLocationUpdates(provider_fine,
                 MAXSECWITHOUTREFRESHLOC * 1000, 0, locationListenerGps);
 
         //Preferisco il GPS, richiedendo meno aggiornamenti dalla localizzazione di rete
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, minDistance+5,
+        Criteria criteria_net = new Criteria();
+        criteria_net.setAccuracy(Criteria.ACCURACY_COARSE);
+        criteria_net.setPowerRequirement(Criteria.POWER_LOW);
+        String provider_coarse = mLocationManager.getBestProvider(criteria_net, true);
+        mLocationManager.requestLocationUpdates(provider_coarse, 0, minDistance + 5,
                     locationListenerNetwork);
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+        mLocationManager.requestLocationUpdates(provider_coarse,
                 (MAXSECWITHOUTREFRESHLOC * 1000) + 4000, 0, locationListenerNetwork);
 
         timer1 = new Timer();
