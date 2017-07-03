@@ -112,14 +112,16 @@ class MyLocation {
         Criteria criteria_gps = new Criteria();
         criteria_gps.setAccuracy(Criteria.ACCURACY_FINE);
         String provider_fine = mLocationManager.getBestProvider(criteria_gps, true);
-        mLocationManager.requestLocationUpdates(provider_fine, 2000, 0,
+        if (provider_fine != null)
+            mLocationManager.requestLocationUpdates(provider_fine, 0, 0,
                 locationListenerGps);
 
         Criteria criteria_net = new Criteria();
         criteria_net.setAccuracy(Criteria.ACCURACY_COARSE);
         criteria_net.setPowerRequirement(Criteria.POWER_LOW);
         String provider_coarse = mLocationManager.getBestProvider(criteria_net, true);
-        mLocationManager.requestLocationUpdates(provider_coarse, 6000, 0,
+        if (provider_coarse != null)
+            mLocationManager.requestLocationUpdates(provider_coarse, 6000, 0,
                 locationListenerNetwork);
 
         timer1 = new Timer();
