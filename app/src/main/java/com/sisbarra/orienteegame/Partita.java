@@ -37,7 +37,7 @@ class Partita {
             public void run() {
                 decreasePrize(10);
             }
-        }, SECONDS_FOR_LESSPRIZE * 1000);
+        }, SECONDS_FOR_LESSPRIZE * 1000, SECONDS_FOR_LESSPRIZE * 1000);
     }
 
     //Il metodo finishMatch ritorna il prize

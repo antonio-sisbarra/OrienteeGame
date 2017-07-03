@@ -492,9 +492,9 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
     public void onSensorChanged(SensorEvent event) {
         boolean accelOrMagnetic = false;
 
-        // get accelerometer data
+        // prende i dati dell'accelerometro
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            // we need to use a low pass filter to make data smoothed
+            // Necessario un filtro passa basso per rendere i dati smoothed
             smoothed = lowPass(event.values.clone(), gravity);
             gravity[0] = smoothed[0];
             gravity[1] = smoothed[1];
@@ -510,26 +510,26 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
 
         }
 
-        // get rotation matrix to get gravity and magnetic data
+        // prende la matrice di rotazione per prendere i dati dell'acceler. e del magnetic
         SensorManager.getRotationMatrix(rotation, null, gravity, geomagnetic);
-        // get bearing to target
+        // prende il bearing verso il nord
         SensorManager.getOrientation(rotation, orientation);
-        // east degrees of true North
+        // i gradi est del vero Nord
         bearing = orientation[0];
-        // convert from radians to degrees
+        // converte da radianti in gradi
         bearing = Math.toDegrees(bearing);
 
-        // fix difference between true North and magnetical North
+        // fixa la differenza tra nord vero e nord magnetico
         if (geomagneticField != null) {
             bearing += geomagneticField.getDeclination();
         }
 
-        // bearing must be in 0-360
+        // bearing dovrebbe essere compreso tra 0 e 360
         if (bearing < 0) {
             bearing += 360;
         }
 
-        // update compass view
+        // aggiorna la compassview
         mCompassView.setBearing((float) bearing);
 
         if (accelOrMagnetic) {
