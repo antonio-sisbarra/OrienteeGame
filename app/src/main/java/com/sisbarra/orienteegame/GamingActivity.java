@@ -20,7 +20,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -151,9 +150,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
 
         //Riferimenti al layout
         getLayoutReferences();
-
-        //WakeLock per il gaming
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
