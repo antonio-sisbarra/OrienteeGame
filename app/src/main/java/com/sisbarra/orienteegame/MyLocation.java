@@ -198,9 +198,16 @@ class MyLocation {
 
             }
 
-            gps_loc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Criteria criteria_gps = new Criteria();
+            criteria_gps.setAccuracy(Criteria.ACCURACY_FINE);
+            String provider_fine = mLocationManager.getBestProvider(criteria_gps, true);
+            gps_loc = mLocationManager.getLastKnownLocation(provider_fine);
 
-            net_loc = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Criteria criteria_net = new Criteria();
+            criteria_net.setAccuracy(Criteria.ACCURACY_COARSE);
+            criteria_net.setPowerRequirement(Criteria.POWER_LOW);
+            String provider_coarse = mLocationManager.getBestProvider(criteria_net, true);
+            net_loc = mLocationManager.getLastKnownLocation(provider_coarse);
 
             //Prendo come valore il più accurato
             if (gps_loc != null && net_loc != null) {
