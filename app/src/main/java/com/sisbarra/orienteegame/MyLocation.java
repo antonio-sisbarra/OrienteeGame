@@ -22,6 +22,7 @@ import java.util.TimerTask;
 
 class MyLocation {
 
+    private static int SECONDSFORLOCCOARSE = 8;
     private LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
@@ -30,8 +31,10 @@ class MyLocation {
     //I listener
     private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
-            //Non accetto la location, se ho già una location e se l'errore stimato è di range metri.
-            if (mLastLoc != null && location.getAccuracy() > (GamingActivity.RANGE) + 2)
+            //Non accetto la location, se ho già una location, se l'errore stimato è di range metri,
+            // e se non è passato troppo tempo dall'ultima location
+            if (mLastLoc != null && location.getAccuracy() > (GamingActivity.RANGE) + 2
+                    && location.getTime() - mLastLoc.getTime() < (SECONDSFORLOCCOARSE * 1000))
                 return;
 
             //Non accetto comunque la location se accuracy è bassa
@@ -57,8 +60,10 @@ class MyLocation {
     };
     private LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
-            //Non accetto la location, se ho già una location e se l'errore stimato è di range metri.
-            if (mLastLoc != null && location.getAccuracy() > (GamingActivity.RANGE) + 2)
+            //Non accetto la location, se ho già una location, se l'errore stimato è di range metri,
+            // e se non è passato troppo tempo dall'ultima location
+            if (mLastLoc != null && location.getAccuracy() > (GamingActivity.RANGE) + 2
+                    && location.getTime() - mLastLoc.getTime() < (SECONDSFORLOCCOARSE * 1000))
                 return;
 
             //Non accetto comunque la location se accuracy è bassa
