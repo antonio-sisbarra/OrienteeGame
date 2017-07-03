@@ -21,6 +21,7 @@ import java.util.TimerTask;
 
 class MyLocation {
 
+    private static int MAXSECWITHOUTREFRESHLOC = 5;
     private LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
@@ -136,13 +137,17 @@ class MyLocation {
 
         }
 
-        /* QUI SOLO LA DISTANZA CONTA, SENZA AVER PERCORSO I M NECESSARI NON ARRIVA AGGIORNAMENTO */
+        /* Registro due volte per avere almeno ogni tot secondi un aggiornamento */
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, minDistance,
                     locationListenerGps);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                MAXSECWITHOUTREFRESHLOC * 1000, 0, locationListenerGps);
 
         //Preferisco il GPS, richiedendo meno aggiornamenti dalla localizzazione di rete
         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, minDistance+5,
                     locationListenerNetwork);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                (MAXSECWITHOUTREFRESHLOC * 1000) + 4000, 0, locationListenerNetwork);
 
         timer1 = new Timer();
         timer1.schedule(new GetLastLocation(), 10000);
