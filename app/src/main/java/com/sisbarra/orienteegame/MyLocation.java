@@ -22,7 +22,6 @@ import java.util.TimerTask;
 
 class MyLocation {
 
-    private static int MAXSECWITHOUTREFRESHLOC = 5;
     private LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
@@ -144,14 +143,12 @@ class MyLocation {
 
         }
 
-        /* Registro due volte per avere almeno ogni tot secondi un aggiornamento */
+        /* Mi importa se l'utente cambia distanza */
         Criteria criteria_gps = new Criteria();
         criteria_gps.setAccuracy(Criteria.ACCURACY_FINE);
         String provider_fine = mLocationManager.getBestProvider(criteria_gps, true);
         mLocationManager.requestLocationUpdates(provider_fine, 0, minDistance,
                     locationListenerGps);
-        mLocationManager.requestLocationUpdates(provider_fine,
-                MAXSECWITHOUTREFRESHLOC * 1000, 0, locationListenerGps);
 
         //Preferisco il GPS, richiedendo meno aggiornamenti dalla localizzazione di rete
         Criteria criteria_net = new Criteria();
@@ -160,8 +157,6 @@ class MyLocation {
         String provider_coarse = mLocationManager.getBestProvider(criteria_net, true);
         mLocationManager.requestLocationUpdates(provider_coarse, 0, minDistance + 5,
                     locationListenerNetwork);
-        mLocationManager.requestLocationUpdates(provider_coarse,
-                (MAXSECWITHOUTREFRESHLOC * 1000) + 4000, 0, locationListenerNetwork);
 
         timer1 = new Timer();
         timer1.schedule(new GetLastLocation(), 10000);
