@@ -31,7 +31,7 @@ class MyLocation {
     private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
             //Non accetto la location, se ho già una location e se l'errore stimato è di range metri.
-            if (mLastLoc != null && location.getAccuracy() >= (GamingActivity.RANGE))
+            if (mLastLoc != null && location.getAccuracy() > (GamingActivity.RANGE) + 2)
                 return;
 
             //Non accetto comunque la location se accuracy è bassa
@@ -58,7 +58,7 @@ class MyLocation {
     private LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
             //Non accetto la location, se ho già una location e se l'errore stimato è di range metri.
-            if (mLastLoc != null && location.getAccuracy() >= (GamingActivity.RANGE))
+            if (mLastLoc != null && location.getAccuracy() > (GamingActivity.RANGE) + 2)
                 return;
 
             //Non accetto comunque la location se accuracy è bassa
@@ -119,47 +119,6 @@ class MyLocation {
 
         timer1 = new Timer();
         timer1.schedule(new GetLastLocation(), 7000);
-        return true;
-    }
-
-    //Con questo metodo setto anche un fattore di cambio posizione nel location updates
-    boolean setDistanceForUpdates(Context context, LocationResult result, int minDistance){
-        //Uso la callback di location result per passare la posizione attuale all'utente
-        locationResult = result;
-
-        //Rimuovo i precedenti updates
-        mLocationManager.removeUpdates(locationListenerGps);
-        mLocationManager.removeUpdates(locationListenerNetwork);
-
-        //Controllo esplicitamente i permessi
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(mActivity,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    0);
-
-        }
-
-        /* Mi importa se l'utente cambia distanza */
-        Criteria criteria_gps = new Criteria();
-        criteria_gps.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider_fine = mLocationManager.getBestProvider(criteria_gps, true);
-        mLocationManager.requestLocationUpdates(provider_fine, 0, minDistance,
-                    locationListenerGps);
-
-        //Preferisco il GPS, richiedendo meno aggiornamenti dalla localizzazione di rete
-        Criteria criteria_net = new Criteria();
-        criteria_net.setAccuracy(Criteria.ACCURACY_COARSE);
-        criteria_net.setPowerRequirement(Criteria.POWER_LOW);
-        String provider_coarse = mLocationManager.getBestProvider(criteria_net, true);
-        mLocationManager.requestLocationUpdates(provider_coarse, 0, minDistance + 5,
-                    locationListenerNetwork);
-
-        timer1 = new Timer();
-        timer1.schedule(new GetLastLocation(), 10000);
         return true;
     }
 

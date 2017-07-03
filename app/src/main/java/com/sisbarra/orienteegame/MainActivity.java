@@ -25,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import static com.sisbarra.orienteegame.R.style.AppAlertTheme;
@@ -33,8 +32,6 @@ import static com.sisbarra.orienteegame.R.style.AppAlertTheme;
 //Codice dell'activity principale che contiene le tre sezioni della app
 public class MainActivity extends AppCompatActivity {
 
-    //Costante per la mindistance per listener della posizione
-    public static final int MINDISTANCE = 5;
     //Numero di tab nell'app
     private static final int mNTabs = 3;
     //Nome delle preferences
@@ -62,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean mNetworkEnabled;
     private boolean mInternetEnabled;
     //Riferimenti per il caricamento del DB
-    private ListView mLstTargets;
-    private TargetsListCursorAdapter mAdapter;
     private DataBaseHelper mHelper;
     //Listener della posizione
     private MyLocation.LocationResult mLocationResult;
@@ -142,8 +137,6 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     frag.setTargetText(getString(R.string.header_target_text));
-                                    mMyLocation.setDistanceForUpdates(getApplicationContext(),
-                                            mLocationResult, MINDISTANCE);
                                     findViewById(R.id.loadingTargetPanel).setVisibility(View.GONE);
                                 }
                             });

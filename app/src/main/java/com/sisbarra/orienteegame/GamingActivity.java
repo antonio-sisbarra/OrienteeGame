@@ -45,8 +45,6 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
-    //MinDistance per aggiornamenti posizione (in metri)
-    private static final int MINDISTANCE_UPDATES = 2;
     private final Handler mHideHandler = new Handler();
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
@@ -322,7 +320,7 @@ public class GamingActivity  extends AppCompatActivity implements SensorEventLis
             }
         };
         mMyLocation = new MyLocation(mLocationManager, this);
-        mMyLocation.setDistanceForUpdates(this, mLocationResult, MINDISTANCE_UPDATES);
+        mMyLocation.getLocation(this, mLocationResult);
     }
 
     private void updateLocation(Location loc){
