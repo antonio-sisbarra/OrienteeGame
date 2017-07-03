@@ -48,9 +48,15 @@ class Partita {
     }
 
     private void decreasePrize(int decrease){
-        if(mPrize == 0) return;
+        if (mPrize == 0) {
+            mTimer.cancel();
+            return;
+        }
         mPrize = mPrize - decrease;
-        if(mPrize<0) mPrize = 0;
+        if (mPrize < 0) {
+            mPrize = 0;
+            mTimer.cancel();
+        }
     }
 
     /** GETTER E SETTER PER I VARI CAMPI **/

@@ -34,16 +34,27 @@ public class Percorso {
         mNamePlayer = player;
     }
 
-    //Aggiunge il punto alla lista
-    public void addPoint(LatLng p){
-        mLatLngs.add(p);
+    //Aggiunge il punto alla lista (se l'ultimo è diverso da quello che voglio aggiungere)
+    void addPoint(LatLng p) {
+        if (isNew(p))
+            mLatLngs.add(p);
     }
 
-    public int getSize(){
+    //Metodo private che mi dice se la posizione che si vuole aggiungere è nuova oppure no
+    private boolean isNew(LatLng p) {
+        if (p == null) return false;
+        if (getSize() == 0) return true;
+        LatLng lastP = mLatLngs.get(mLatLngs.size() - 1);
+        double lastLat = lastP.latitude;
+        double lastLong = lastP.longitude;
+        return !(p.latitude == lastLat && p.longitude == lastLong);
+    }
+
+    int getSize() {
         return mLatLngs.size();
     }
 
-    public ArrayList<LatLng> getPointsLists(){
+    ArrayList<LatLng> getPointsLists() {
         return new ArrayList<LatLng>(mLatLngs);
     }
 
@@ -51,7 +62,7 @@ public class Percorso {
         return mTarget;
     }
 
-    public String getNameTarget() {
+    String getNameTarget() {
         return mNameTarget;
     }
 
@@ -59,11 +70,11 @@ public class Percorso {
         return mNamePlayer;
     }
 
-    public int getPrize() {
+    int getPrize() {
         return mPrize;
     }
 
-    public void setPrize(int prize) {
+    void setPrize(int prize) {
         mPrize = prize;
     }
 }

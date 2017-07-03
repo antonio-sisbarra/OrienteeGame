@@ -118,7 +118,7 @@ class MyLocation {
                 locationListenerNetwork);
 
         timer1 = new Timer();
-        timer1.schedule(new GetLastLocation(), 7000);
+        timer1.schedule(new GetLastLocation(), 10000);
         return true;
     }
 
