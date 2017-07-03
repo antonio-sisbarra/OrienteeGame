@@ -29,7 +29,8 @@ class Partita {
         mTarget = target;
         mActualLocation = actualLocation;
         mDistance = dist;
-        mPrize = mDistance * MULTIPLICATOR_PRIZE;
+        //Impongo una base di punti per obiettivi vicinissimi (0 metri)
+        mPrize = mDistance * MULTIPLICATOR_PRIZE + (SECONDS_FOR_LESSPRIZE);
         mTargetTitle = title;
         mTimer = new Timer();
         mTimer.schedule(new TimerTask() {
