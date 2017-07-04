@@ -81,9 +81,14 @@ class MyLocation {
     //Metodo private che descrive le politiche di accettazione di una loc(in base a tempo e accuracy)
     private boolean isAcceptable(Location loc) {
         if (loc == null) return false;
+        //CASO NON HO LOC
+        if (mLastLoc == null) {
+            return loc.getAccuracy() < (3 * GamingActivity.RANGE);
+        }
+
         //CASO TOO OLD
-        if (mLastLoc == null || ((loc.getTime() - mLastLoc.getTime() > 13000) &&
-                loc.getAccuracy() < (3 * GamingActivity.RANGE)))
+        if (loc.getTime() - mLastLoc.getTime() > 13000 &&
+                loc.getAccuracy() < (3 * GamingActivity.RANGE))
             return true;
 
         //CASO OLD
