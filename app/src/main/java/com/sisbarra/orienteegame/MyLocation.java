@@ -92,7 +92,7 @@ class MyLocation {
             return true;
 
         //CASO RECENT
-        return loc.getAccuracy() < (1.5 * GamingActivity.RANGE);
+        return loc.getAccuracy() < (GamingActivity.RANGE);
 
     }
 
