@@ -82,8 +82,8 @@ class MyLocation {
     private boolean isAcceptable(Location loc) {
         if (loc == null) return false;
         //CASO TOO OLD
-        if ((mLastLoc == null || loc.getTime() - mLastLoc.getTime() > 13000) &&
-                loc.getAccuracy() < (3 * GamingActivity.RANGE))
+        if (mLastLoc == null || ((loc.getTime() - mLastLoc.getTime() > 13000) &&
+                loc.getAccuracy() < (3 * GamingActivity.RANGE)))
             return true;
 
         //CASO OLD
