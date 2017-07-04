@@ -22,7 +22,6 @@ import java.util.TimerTask;
 
 class MyLocation {
 
-    private static int SECONDSFORLOCCOARSE = 8;
     private LocationResult locationResult;
     private Timer timer1;
     private LocationManager mLocationManager;
@@ -31,14 +30,7 @@ class MyLocation {
     //I listener
     private LocationListener locationListenerGps = new LocationListener() {
         public void onLocationChanged(Location location) {
-            //Non accetto la location, se ho già una location, se l'errore stimato è di range metri,
-            // e se non è passato troppo tempo dall'ultima location
-            if (mLastLoc != null && location.getAccuracy() > (GamingActivity.RANGE) + 2
-                    && location.getTime() - mLastLoc.getTime() < (SECONDSFORLOCCOARSE * 1000))
-                return;
-
-            //Non accetto comunque la location se accuracy è bassa
-            if (location.getAccuracy() > (3 * GamingActivity.RANGE))
+            if (!isAcceptable(location))
                 return;
 
             timer1.cancel();
@@ -60,14 +52,7 @@ class MyLocation {
     };
     private LocationListener locationListenerNetwork = new LocationListener() {
         public void onLocationChanged(Location location) {
-            //Non accetto la location, se ho già una location, se l'errore stimato è di range metri,
-            // e se non è passato troppo tempo dall'ultima location
-            if (mLastLoc != null && location.getAccuracy() > (GamingActivity.RANGE) + 2
-                    && location.getTime() - mLastLoc.getTime() < (SECONDSFORLOCCOARSE * 1000))
-                return;
-
-            //Non accetto comunque la location se accuracy è bassa
-            if (location.getAccuracy() > (3 * GamingActivity.RANGE))
+            if (!isAcceptable(location))
                 return;
 
             timer1.cancel();
@@ -91,6 +76,24 @@ class MyLocation {
     MyLocation(LocationManager lm, Activity activ) {
         mLocationManager = lm;
         mActivity = activ;
+    }
+
+    //Metodo private che descrive le politiche di accettazione di una loc(in base a tempo e accuracy)
+    private boolean isAcceptable(Location loc) {
+        if (loc == null) return false;
+        //CASO TOO OLD
+        if ((mLastLoc == null || loc.getTime() - mLastLoc.getTime() > 13000) &&
+                loc.getAccuracy() < (3 * GamingActivity.RANGE))
+            return true;
+
+        //CASO OLD
+        if (loc.getTime() - mLastLoc.getTime() > 8000 &&
+                loc.getAccuracy() < (2 * GamingActivity.RANGE))
+            return true;
+
+        //CASO RECENT
+        return loc.getAccuracy() < (1.5 * GamingActivity.RANGE);
+
     }
 
     boolean getLocation(Context context, LocationResult result) {
